@@ -2,17 +2,17 @@ use std::collections::LinkedList;
 
 use super::value::Value;
 
-pub struct Stack<'e, 'm> {
-  ahead_stack: Vec<Value<'e, 'm>>,
-  stack: Vec<Value<'e, 'm>>
+pub struct Stack {
+  ahead_stack: Vec<Value>,
+  stack: Vec<Value>
 }
 
-impl<'e, 'm> Stack<'e, 'm> {
-  pub fn push(&mut self, value: Value<'e, 'm>) {
+impl Stack {
+  pub fn push(&mut self, value: Value) {
     self.stack.push(value);
   }
 
-  pub fn pop(&mut self) -> Option<Value<'e, 'm>> {
+  pub fn pop(&mut self) -> Option<Value> {
     self.stack.pop()
   }
 

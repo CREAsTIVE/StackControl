@@ -4,42 +4,42 @@ use crate::{bytecode::command::{core::ListGeneratorCommand, stack_manipulators::
 
 use super::{command_map::{CommandMap}, lexer::{CommandToken, Token}};
 
-pub struct CompileTime<'e, 'm> {
-  pub command_map: CommandMap<'e, 'm>,
-  list_opener: Box<DescribedCommand<'e, 'm>>, // StackPusherCommand{value_to_push: Value::OpenListIdentifier}
-  list_generator: Box<DescribedCommand<'e, 'm>>,
-  stack_pusher_meta: Box<CommandMeta>
+pub struct CompileTime {
+  pub command_map: CommandMap,
+  list_opener: Arc<DescribedCommand>, // StackPusherCommand{value_to_push: Value::OpenListIdentifier}
+  list_generator: Arc<DescribedCommand>,
+  stack_pusher_meta: Arc<CommandMeta>
 }
 
 
-impl<'a> CompileTime<'a, 'a> {
-  pub fn new() -> CompileTime<'a, 'a> {
+impl CompileTime {
+  pub fn new() -> Self {
     CompileTime { 
       command_map: CommandMap::new(), 
 
-      list_opener: Box::new(DescribedCommand {
+      list_opener: Arc::new(DescribedCommand {
         execution: Box::new(StackPusherCommand {
           value_to_push: Value::OpenListIdentifier
         }),
-        meta: Holder::Val(Box::new(CommandMeta {
+        meta: Arc::new(CommandMeta {
           name: '(',
           aliases: vec![
             String::from("listopen")
           ]
-        }))
+        })
       }), 
 
-      list_generator: Box::new(DescribedCommand {
+      list_generator: Arc::new(DescribedCommand {
         execution: Box::new(ListGeneratorCommand {}),
-        meta: Holder::Val(Box::new(CommandMeta {
+        meta: Arc::new(CommandMeta {
           name: ')',
           aliases: vec![
             String::from("listgen")
           ]
-        }))
+        })
       }),
 
-      stack_pusher_meta: Box::new(CommandMeta {
+      stack_pusher_meta: Arc::new(CommandMeta {
         name: 'ъ',
         aliases: vec![
           String::from("pushstack")
@@ -48,63 +48,58 @@ impl<'a> CompileTime<'a, 'a> {
     }
   }
 
-  pub fn compile<'s: 'a>(&self, tokens: Vec<Token>) -> Option<Vec<ArcHolder<'s, DescribedCommand>>> {
+  pub fn compile(&self, tokens: Vec<Token>) -> Option<Vec<Arc<DescribedCommand>>> {
     let mut iter  = tokens.into_iter();
     let commands = self.parse_commands(&mut iter);
     if let Some(_) = iter.next() {return None} // todo: error message (unparsed tokens after ")")
     commands
   }
 
-  fn parse_command<'s: 'a>(
-      &self, 
+  fn parse_command<'a>(
+      &'a self, 
       token: CommandToken, 
-      tokens: &mut impl Iterator<Item = Token>) -> Option<ArcHolder<'s, DescribedCommand>> {
-
-    /*
-    if let CommandToken::Command(name) = token {
-      return Some(Holder::Ref(self.command_map.get(name)?))
-    }
-    */
+      tokens: &mut impl Iterator<Item = Token>) -> Option<Arc<DescribedCommand>> {
+    
 
     Some(match token {
       CommandToken::Number(num) => {
-        ArcHolder::Val(Arc::new(DescribedCommand {
+        Arc::new(DescribedCommand {
           execution: Box::new(StackPusherCommand {
             value_to_push: Value::Number(num)
           }),
-          meta: Holder::Ref(self.stack_pusher_meta.as_ref()) // TODO: Another meta
-        }))
+          meta: self.stack_pusher_meta.clone() // TODO: Another meta
+        })
       },
 
       CommandToken::Function => {
         if let Token::CommandToken(token) = tokens.next()? {
-          ArcHolder::Val(Arc::new(DescribedCommand {
+          Arc::new(DescribedCommand {
             execution: Box::new(StackPusherCommand {
               value_to_push: Value::CommandContainer(self.parse_command(token, tokens)?)
             }),
-            meta: Holder::Ref(&self.stack_pusher_meta)
-          }))
+            meta: self.stack_pusher_meta.clone()
+          })
         } else {return None;} // TODO: Error
       },
 
       CommandToken::Command(name) =>
-        ArcHolder::Ref(self.command_map.get(name)?),
+        self.command_map.get(name)?,
       
       CommandToken::CommandOrAlias(alias) =>
-        ArcHolder::Ref(self.command_map.get(self.command_map.get_alias(&alias)?)?),
+        self.command_map.get(self.command_map.get_alias(&alias)?)?,
 
       CommandToken::ListOpenBracket =>
-        ArcHolder::Ref(self.list_opener.as_ref()),
+        self.list_opener.clone(),
 
       CommandToken::ListCloseBracket =>
-        ArcHolder::Ref(self.list_generator.as_ref()),
+        self.list_generator.clone(),
     })
   }
 
   // TODO: change Vec to impl Iterator<CommandExecutable>
-  fn parse_commands<'s: 'a>(
+  fn parse_commands(
     &self, 
-    tokens: &mut impl Iterator<Item = Token>) -> Option<Vec<ArcHolder<'s, DescribedCommand>>> {
+    tokens: &mut impl Iterator<Item = Token>) -> Option<Vec<Arc<DescribedCommand>>> {
     
     let mut commands = Vec::new(); // Use iterator
 
@@ -116,12 +111,12 @@ impl<'a> CompileTime<'a, 'a> {
           // TODO: Iter
           let sublist = self.parse_commands(tokens)?;
           for exec in sublist {
-            commands.push(ArcHolder::Val(Arc::new(DescribedCommand {
+            commands.push(Arc::new(DescribedCommand {
               execution: Box::new(StackPusherCommand {
                 value_to_push: Value::CommandContainer(exec)
               }),
-              meta: Holder::Ref(self.stack_pusher_meta.as_ref())
-            })));
+              meta: self.stack_pusher_meta.clone()
+            }));
           };
         },
         Token::CommandToken(cmd) => 

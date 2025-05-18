@@ -1,28 +1,32 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
 
 use crate::bytecode::command::DescribedCommand;
 
-pub struct CommandMap<'e, 'm> {
-  collection: HashMap<char, DescribedCommand<'e, 'm>>,
+pub struct CommandMap {
+  // I know hashmap of arcs is bs
+  // BUT i waste like 2-3 days trying to do everything on lifetimes and pure references
+  // Yeah, i m stupid, maybe later i will fix that
+  // but for now i fcking tired, so forgive me once
+  collection: HashMap<char, Arc<DescribedCommand>>,
   aliases_collection: HashMap<String, char>
 }
 
-impl<'e, 'm> CommandMap<'e, 'm> {
-  pub fn new() -> CommandMap<'e, 'm> {
+impl CommandMap {
+  pub fn new() -> CommandMap {
     CommandMap { 
       collection: HashMap::new(),
       aliases_collection: HashMap::new()
     }
   }
 
-  pub fn set(&mut self, command: DescribedCommand<'e, 'm>) {
-    command.meta.to_ref().aliases.iter()
-      .for_each(|e| { self.aliases_collection.insert(e.clone(), command.meta.to_ref().name);});
-    self.collection.insert(command.meta.to_ref().name, command);
+  pub fn set(&mut self, command: DescribedCommand) {
+    command.meta.aliases.iter()
+      .for_each(|e| { self.aliases_collection.insert(e.clone(), command.meta.name);});
+    self.collection.insert(command.meta.name, Arc::new(command));
   }
 
-  pub fn get(&self, name: char) -> Option<&DescribedCommand<'e, 'm>> {
-    self.collection.get(&name)
+  pub fn get<'a>(&'a self, name: char) -> Option<Arc<DescribedCommand>> {
+    Some(self.collection.get(&name)?.clone())
   }
 
   pub fn get_alias(&self, alias: &str) -> Option<char> {

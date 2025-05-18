@@ -10,6 +10,7 @@ pub enum ExecutionResult {
 }
 pub trait CommandExecutable {
   fn execute(&self, stack: &mut Stack) -> ExecutionResult;
+  fn to_string(&self) -> String;
 }
 
 pub struct DescribedCommand {

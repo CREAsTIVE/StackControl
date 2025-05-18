@@ -1,14 +1,22 @@
-use crate::runtime::{stack::Stack, value::Value};
+use crate::{runtime::{stack::Stack, value::Value}};
 
-use super::{CommandExecutable, ExecutionResult};
+use super::{core::define_commands, CommandExecutable, ExecutionResult};
 
-pub struct StackPusherCommand {
-  pub value_to_push: Value
+fn test(stack: &mut Stack) -> ExecutionResult {
+  stack.move_left();
+  ExecutionResult::Success
 }
 
-impl CommandExecutable for StackPusherCommand {
-  fn execute(&self, stack: &mut Stack) -> super::ExecutionResult {
-    stack.push(self.value_to_push.clone());
-    ExecutionResult::Success
-  }
-}
+define_commands!(define stack_manipulators 
+  (
+    MoveLeftCommand ('←') ["mvl"] to stack {
+      stack.move_left();
+      ExecutionResult::Success
+    }
+  ), (
+    MoveRightCommand ('→') ["mvr"] to stack {
+      stack.move_right();
+      ExecutionResult::Success
+    }
+  )
+);

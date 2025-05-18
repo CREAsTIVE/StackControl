@@ -1,4 +1,5 @@
-use std::collections::LinkedList;
+
+use std::fmt::Debug;
 
 use super::value::Value;
 
@@ -8,6 +9,20 @@ pub struct Stack {
 }
 
 impl Stack {
+  pub fn new() -> Self {
+    Stack {
+      ahead_stack: vec![],
+      stack: vec![]
+    }
+  }
+
+  pub fn copy(&self) -> Vec<Value> {
+    let mut clone = self.stack.clone();
+    let mut ahead = self.ahead_stack.clone(); ahead.reverse();
+    clone.append(&mut ahead);
+    clone
+  }
+
   pub fn push(&mut self, value: Value) {
     self.stack.push(value);
   }

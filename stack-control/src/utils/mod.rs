@@ -30,12 +30,3 @@ impl<'a, T: ?Sized> ArcHolder<'a, T> {
     }
   }
 }
-
-impl<'a, T: ?Sized> Clone for ArcHolder<'a, T> {
-  fn clone(&self) -> Self {
-    match self {
-      Self::Ref(arg0) => Self::Ref(arg0.clone()),
-      Self::Val(arg0) => Self::Val(arg0.clone()),
-    }
-  }
-}

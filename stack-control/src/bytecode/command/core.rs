@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::{compiletime::command_map::{self, CommandMap}, runtime::{stack::Stack, value::Value}};
+use crate::{compiletime::command_map::{self, CommandMap}, runtime::{stack::Stack, value::{Array, Value}}};
 use indoc::indoc;
 use super::{CommandExecutable, CommandMeta, DescribedCommand, ExecutionResult};
 
@@ -77,7 +77,7 @@ impl CommandExecutable for ListGeneratorCommand {
     }
     new_list.reverse();
     
-    stack.push(Value::Array(new_list));
+    stack.push(Value::Array(Array::from(new_list)));
     super::ExecutionResult::Success
   }
 

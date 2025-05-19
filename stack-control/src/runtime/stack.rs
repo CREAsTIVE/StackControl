@@ -1,12 +1,12 @@
-
-use std::fmt::Debug;
-
 use super::value::Value;
 
 pub struct Stack {
   ahead_stack: Vec<Value>,
   stack: Vec<Value>
 }
+
+pub struct NoElementsAheadOfStackException {}
+pub struct NoElementsOnStackException {}
 
 impl Stack {
   pub fn new() -> Self {
@@ -31,11 +31,13 @@ impl Stack {
     self.stack.pop()
   }
 
-  pub fn move_right(&mut self) {
-    self.stack.push(self.ahead_stack.pop().expect("FIXME"));
+  pub fn move_right(&mut self) -> Result<(), NoElementsAheadOfStackException> {
+    self.stack.push(self.ahead_stack.pop().ok_or(NoElementsAheadOfStackException {})?);
+    Ok(())
   }
 
-  pub fn move_left(&mut self) {
-    self.ahead_stack.push(self.stack.pop().expect("FIXME"));
+  pub fn move_left(&mut self) -> Result<(), NoElementsOnStackException> {
+    self.ahead_stack.push(self.stack.pop().ok_or(NoElementsOnStackException{})?);
+    Ok(())
   }
 }

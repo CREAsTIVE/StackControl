@@ -3,7 +3,7 @@ use indoc::indoc;
 use super::{core::define_commands, CommandExecutable, ExecutionResult};
 
 fn test(stack: &mut Stack) -> ExecutionResult {
-  stack.move_left();
+  stack.pop();
   ExecutionResult::Success
 }
 

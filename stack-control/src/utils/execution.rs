@@ -28,5 +28,5 @@ pub fn execute(code: &str, stack: &mut Stack) -> Result<(), ExecutionException> 
 }
 
 pub fn bind_default_commands(map: &mut CommandMap) {
-  stack_manipulators::stack_manipulators_group(map);
+  stack_manipulators::append_stack_manipulators(map);
 }

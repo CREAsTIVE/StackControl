@@ -13,7 +13,7 @@ fn test(stack: &mut Stack) -> Result<(), RuntimeException> {
       Ok(())
 }
 
-define_commands!(define stack_manipulators_group
+define_commands!(define append_stack_manipulators
   (
     [
       MoveLeftCommand '←' ["mvl"]

@@ -1,8 +1,6 @@
-use std::io::stdin;
-
 use itertools::Itertools;
 use prompted::input;
-use stack_control::{bytecode::command::RuntimeException, runtime::stack::Stack, utils::execution::{execute, ExecutionException}};
+use stack_control::{runtime::stack::Stack, utils::execution::{execute, ExecutionException}};
 
 fn main() {
   loop {
@@ -10,8 +8,6 @@ fn main() {
     if input == "exit" {break;}
 
     let mut stack = Stack::new();
-
-    let e = 
 
     match execute(&input, &mut stack) {
       Err(ExecutionException::Compilation(compile_error)) =>

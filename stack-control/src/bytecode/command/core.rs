@@ -4,30 +4,44 @@ use crate::runtime::{stack::Stack, value::{Array, Value}};
 use super::{CommandExecutable, RuntimeException};
 
 macro_rules! define_commands {
-  (define $group:ident $(($metadata:tt to $stack:ident $defenitions:block)),+) => {
-    define_commands!{defenition $(($metadata to $stack $defenitions)),+}
+  (define $group:ident $(($metadata:tt $stack:ident $defenitions:block)),+) => {
+    define_commands!{defenition $(($metadata $stack $defenitions)),+}
     pub fn $group(cmd_map: &mut $crate::compiletime::command_map::CommandMap) {
-      define_commands!{meta cmd_map $(($metadata to $stack $defenitions)),+}
+      define_commands!{meta cmd_map $(($metadata $stack $defenitions)),+}
     }
   };
 
-  (meta $command_map:ident ([$name:ident $key:tt [$($alias:expr),*] $description:expr] to $stack:ident $defenition:block)) => {
+  // With additional fields
+  (meta $command_map:ident ([$name:ident $key:tt [$($alias:expr),*] {$($vkey:ident : $value:expr),+}] $stack:ident $defenition:block)) => {
     $command_map.set($crate::bytecode::command::DescribedCommand {
       execution: Box::new($name {}),
       meta: std::sync::Arc::new($crate::bytecode::command::CommandMeta {
         key: $key,
         aliases: [$($alias),*].iter().map(|s: &&str| s.to_string()).collect::<Vec<String>>(),
-        description: String::from($description)
+        $($vkey : $value),+,
+        ..core::default::Default::default()
       })
     });
   };
 
-  (meta $command_map:ident ($metadata:tt to $stack:ident $defenition:block), $(($metadatas:tt to $stacks:ident $defenitions:block)),+) => {{
-    define_commands!{meta $command_map ($metadata to $stack $defenition)}
-    define_commands!{meta $command_map $(($metadatas to $stacks $defenitions)),+}
+  // No additional fields
+  (meta $command_map:ident ([$name:ident $key:tt [$($alias:expr),*] {}] $stack:ident $defenition:block)) => {
+    $command_map.set($crate::bytecode::command::DescribedCommand {
+      execution: Box::new($name {}),
+      meta: std::sync::Arc::new($crate::bytecode::command::CommandMeta {
+        key: $key,
+        aliases: [$($alias),*].iter().map(|s: &&str| s.to_string()).collect::<Vec<String>>(),
+        ..core::default::Default::default()
+      })
+    });
+  };
+
+  (meta $command_map:ident ($metadata:tt $stack:ident $defenition:block), $(($metadatas:tt $stacks:ident $defenitions:block)),+) => {{
+    define_commands!{meta $command_map ($metadata $stack $defenition)}
+    define_commands!{meta $command_map $(($metadatas $stacks $defenitions)),+}
   }};
 
-  (defenition ([$name:ident $key:tt [$($alias:expr),*] $description:tt] to $stack:ident $defenition:block)) => {
+  (defenition ([$name:ident $key:tt [$($alias:expr),*] $others:tt] $stack:ident $defenition:block)) => {
     struct $name {}
     impl CommandExecutable for $name {
       fn execute(&self, $stack: &mut $crate::runtime::stack::Stack) -> Result<(), RuntimeException> $defenition
@@ -38,9 +52,9 @@ macro_rules! define_commands {
     }
   };
 
-  (defenition ($metadata:tt to $stack:ident $defenition:block), $(($metadatas:tt to $stacks:ident $defenitions:block)),+) => {
-    define_commands!{defenition ($metadata to $stack $defenition)}
-    define_commands!{defenition $(($metadatas to $stacks $defenitions)),+}
+  (defenition ($metadata:tt $stack:ident $defenition:block), $(($metadatas:tt $stacks:ident $defenitions:block)),+) => {
+    define_commands!{defenition ($metadata $stack $defenition)}
+    define_commands!{defenition $(($metadatas $stacks $defenitions)),+}
   };
 }
 
@@ -53,11 +67,13 @@ define_commands!(define test_group
   (
     [
       RandomMacro 'k' ["alias", "otheralias"]
-      (indoc! {"
-        This is test command.
-        That does nothing.
-      "})
-    ] to stack {
+      {
+        description: String::from(indoc! {"
+          This is test command.
+          That does nothing.
+        "})
+      }
+    ] stack {
       Ok(())
     }
   )

@@ -1,9 +1,9 @@
-# Stack Control  
-
+Stack Control  
+---
 *Try it online! (coming soon)*  
 
 Stack Control is a stack-based programming language created by me. This is a Rust remake of the [original C# version](https://github.com/CREAsTIVE/StackControl-Deprecated).  
-There's no specific purpose for this language – I just created it for fun. It was inspired by [Uiua](https://www.uiua.org/).  
+There's no specific purpose for this language – I just created it for fun. It was inspired by [Uiua](https://www.uiua.org/) and other stack-based languages.  
 
 ### How it works  
 *Documentation coming soon. For now, you can see the [description of the old version](https://github.com/CREAsTIVE/StackControl-Deprecated/blob/master/README.md)*  
@@ -23,5 +23,12 @@ There's no specific purpose for this language – I just created it for fun. It 
    ```  
 *Requires Unicode support in your terminal/console.*  
 
-### TODO  
-*Coming soon*  
+### Pre-Release TODO
+- [ ] Documentation generator
+- [ ] Web version
+- [ ] More command
+  - [ ] Iterable operation
+  - [ ] Array modifiers
+  - [ ] Math operation / equality
+  - [ ] Conditions
+  - [ ] Loops

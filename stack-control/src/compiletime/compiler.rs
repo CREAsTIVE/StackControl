@@ -136,7 +136,6 @@ impl CompileTime {
           // TODO: Iter
           commands.push(self.list_opener.clone());
           let mut sublist_commands = self.parse_commands(tokens)?;
-          sublist_commands.reverse();
           for exec in sublist_commands {
             commands.push(Arc::new(DescribedCommand {
               execution: Box::new(StackPusherCommand {

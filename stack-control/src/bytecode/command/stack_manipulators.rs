@@ -41,7 +41,7 @@ define_commands!(define append_stack_manipulators
     }
   ), (
     [
-      DupCommand '.' ["dup"]
+      DupCommand ':' ["dup"]
       {
         description: String::from(indoc! {"
           Duplicates value on stack
@@ -55,7 +55,7 @@ define_commands!(define append_stack_manipulators
     }
   ), (
     [
-      Dup2Command ':' ["ddup", "dup2"]
+      Dup2Command '⁞' ["ddup", "dup2", "quadrodup"]
       {
         description: String::from(indoc! {"
           Duplicates 2 values on stack
@@ -67,6 +67,32 @@ define_commands!(define append_stack_manipulators
       stack.push(b.clone());
       stack.push(a.clone());
       stack.push(b);
+      stack.push(a);
+      Ok(())
+    }
+  ), (
+    [
+      PopCommand ',' ["pop"]
+      {
+        description: String::from(indoc! {"
+          Pop's value from stack
+        "})
+      }
+    ] stack {
+      stack.pop()?;
+      Ok(())
+    }
+  ), (
+    [
+      Pop2Command ';' ["popnext"]
+      {
+        description: String::from(indoc! {"
+          Pop's second value from stack
+        "})
+      }
+    ] stack {
+      let a = stack.pop()?;
+      stack.pop()?;
       stack.push(a);
       Ok(())
     }

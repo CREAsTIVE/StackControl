@@ -72,7 +72,7 @@ pub fn split_to_tokens<'a>(mut symbols: Peekable<impl Iterator<Item = char> + Cl
       .or_else(|| parse_special_symbol(&mut symbols, ')', Token::FunctionCloseBracket))
       .or_else(|| parse_special_symbol(&mut symbols, '#', Token::CommandToken(CommandToken::Function)))
       .or_else(|| {
-        if (symbols.peek()?.is_whitespace()) {return Some(Token::WhiteSpace(symbols.next()?))}
+        if symbols.peek()?.is_whitespace() {return Some(Token::WhiteSpace(symbols.next()?))}
         None
       })
       .or_else(|| parse_alias(&mut symbols))
@@ -121,6 +121,8 @@ fn parse_number<'a>(iter: &mut Peekable<impl Iterator<Item = char> + Clone>) -> 
   }
 
   second.push('0');
+
+  if first.len() == 1 && second.len() == 1 {return None}
 
   return Some(Token::CommandToken(CommandToken::Number((first + "." + &second).parse::<f64>().expect("Unexcpected Number parsing error"))));
 }

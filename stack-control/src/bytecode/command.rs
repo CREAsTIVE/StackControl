@@ -4,12 +4,14 @@ use crate::{runtime::stack::Stack, utils::Holder};
 
 pub mod stack_manipulators;
 pub mod core;
-pub enum ExecutionResult {
-  Success,
-  Error(&'static str)
+
+#[derive(strum_macros::IntoStaticStr)]
+pub enum RuntimeException {
+  NoElementsAheadOfStack,
+  NoElementsOnStack
 }
 pub trait CommandExecutable {
-  fn execute(&self, stack: &mut Stack) -> ExecutionResult;
+  fn execute(&self, stack: &mut Stack) -> Result<(), RuntimeException>;
   fn to_string(&self) -> String;
 }
 

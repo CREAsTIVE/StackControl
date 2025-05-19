@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use crate::{compiletime::command_map::{self, CommandMap}, runtime::{stack::Stack, value::{Array, Value}}};
 use indoc::indoc;
-use super::{CommandExecutable, CommandMeta, DescribedCommand, ExecutionResult};
+use super::{CommandExecutable, CommandMeta, DescribedCommand, RuntimeException};
 
 macro_rules! define_commands {
   (define $group:ident $(($metadata:tt to $stack:ident $defenitions:block)),+) => {
@@ -31,7 +31,7 @@ macro_rules! define_commands {
   (defenition ([$name:ident $key:tt [$($alias:expr),*] $description:tt] to $stack:ident $defenition:block)) => {
     struct $name {}
     impl CommandExecutable for $name {
-      fn execute(&self, $stack: &mut Stack) -> ExecutionResult $defenition
+      fn execute(&self, $stack: &mut Stack) -> Result<(), RuntimeException> $defenition
 
       fn to_string(&self) -> String {
         String::from($key)
@@ -59,7 +59,7 @@ define_commands!(define test_group
         That does nothing.
       "})
     ] to stack {
-      ExecutionResult::Success
+      Ok(())
     }
   )
 );
@@ -69,16 +69,17 @@ define_commands!(define test_group
 pub struct ListGeneratorCommand {}
 
 impl CommandExecutable for ListGeneratorCommand {
-  fn execute(&self, stack: &mut crate::runtime::stack::Stack) -> super::ExecutionResult {
+  fn execute(&self, stack: &mut crate::runtime::stack::Stack) -> Result<(), RuntimeException> {
     let mut new_list = Vec::new();
-    while let Some(v) = stack.pop() {
+    loop {
+      let v = stack.pop()?;
       if let Value::OpenListIdentifier = v {break;}
       new_list.push(v);
     }
     new_list.reverse();
     
     stack.push(Value::Array(Array::from(new_list)));
-    super::ExecutionResult::Success
+    Ok(())
   }
 
   fn to_string(&self) -> String {
@@ -91,9 +92,9 @@ pub struct StackPusherCommand {
   pub value_to_push: Value
 }
 impl CommandExecutable for StackPusherCommand {
-  fn execute(&self, stack: &mut Stack) -> super::ExecutionResult {
+  fn execute(&self, stack: &mut Stack) -> Result<(), RuntimeException> {
     stack.push(self.value_to_push.clone());
-    ExecutionResult::Success
+    Ok(())
   }
 
   fn to_string(&self) -> String {

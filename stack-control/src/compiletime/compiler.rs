@@ -2,7 +2,7 @@ use std::{fmt::{self, format}, sync::Arc};
 
 use indoc::indoc;
 
-use crate::{bytecode::command::{core::{ListGeneratorCommand, StackPusherCommand}, CommandExecutable, CommandMeta, DescribedCommand, ExecutionResult}, runtime::value::Value, utils::{ArcHolder, Holder}};
+use crate::{bytecode::command::{core::{ListGeneratorCommand, StackPusherCommand}, CommandExecutable, CommandMeta, DescribedCommand, RuntimeException}, runtime::value::Value, utils::{ArcHolder, Holder}};
 
 use super::{command_map::{CommandMap}, lexer::{CommandToken, Token}};
 
@@ -13,25 +13,25 @@ pub struct CompileTime {
   stack_pusher_meta: Arc<CommandMeta>
 }
 
-pub enum CompilationError {
+pub enum CompilationException {
   UnexcpectedEndToken(String),
   FunctionTokenRequired,
   CommandNotFound(char),
   AliasNotFound(String),
 }
 
-impl ToString for CompilationError {
+impl ToString for CompilationException {
   fn to_string(&self) -> String {
     match self {
-      CompilationError::AliasNotFound(alias) =>
+      CompilationException::AliasNotFound(alias) =>
         format!("Alias {alias} not found"),
-      CompilationError::CommandNotFound(cmd) => 
+      CompilationException::CommandNotFound(cmd) => 
         format!("Command {cmd} not found"),
       
-      CompilationError::FunctionTokenRequired =>
+      CompilationException::FunctionTokenRequired =>
         format!("Function token required"),
 
-      CompilationError::UnexcpectedEndToken(t) => 
+      CompilationException::UnexcpectedEndToken(t) => 
         format!("Unexcpected END token: {t}")
     }
   }
@@ -82,17 +82,17 @@ impl CompileTime {
     }
   }
 
-  pub fn compile(&self, tokens: Vec<Token>) -> Result<Vec<Arc<DescribedCommand>>, CompilationError> {
+  pub fn compile(&self, tokens: Vec<Token>) -> Result<Vec<Arc<DescribedCommand>>, CompilationException> {
     let mut iter  = tokens.into_iter();
     let commands = self.parse_commands(&mut iter)?;
-    if let Some(e) = iter.next() {return Err(CompilationError::UnexcpectedEndToken(e.to_string()))} // todo: error message (unparsed tokens after ")")
+    if let Some(e) = iter.next() {return Err(CompilationException::UnexcpectedEndToken(e.to_string()))} // todo: error message (unparsed tokens after ")")
     Ok(commands)
   }
 
   fn parse_command<'a>(
       &'a self, 
       token: CommandToken, 
-      tokens: &mut impl Iterator<Item = Token>) -> Result<Arc<DescribedCommand>, CompilationError> {
+      tokens: &mut impl Iterator<Item = Token>) -> Result<Arc<DescribedCommand>, CompilationException> {
     
 
     Ok(match token {
@@ -106,23 +106,23 @@ impl CompileTime {
       },
 
       CommandToken::Function => {
-        if let Token::CommandToken(token) = tokens.next().ok_or(CompilationError::FunctionTokenRequired)? {
+        if let Token::CommandToken(token) = tokens.next().ok_or(CompilationException::FunctionTokenRequired)? {
           Arc::new(DescribedCommand {
             execution: Box::new(StackPusherCommand {
               value_to_push: Value::CommandContainer(self.parse_command(token, tokens)?)
             }),
             meta: self.stack_pusher_meta.clone()
           })
-        } else {return Err(CompilationError::FunctionTokenRequired);} // TODO: Error
+        } else {return Err(CompilationException::FunctionTokenRequired);} // TODO: Error
       },
 
       CommandToken::Command(name) =>
-        self.command_map.get(name).ok_or(CompilationError::CommandNotFound(name))?,
+        self.command_map.get(name).ok_or(CompilationException::CommandNotFound(name))?,
       
       CommandToken::CommandOrAlias(alias) =>
         self.command_map.get(
-          self.command_map.get_alias(&alias).ok_or(CompilationError::AliasNotFound(alias))?
-        ).ok_or(CompilationError::CommandNotFound('0'))?,
+          self.command_map.get_alias(&alias).ok_or(CompilationException::AliasNotFound(alias))?
+        ).ok_or(CompilationException::CommandNotFound('0'))?,
 
       CommandToken::ListOpenBracket =>
         self.list_opener.clone(),
@@ -135,7 +135,7 @@ impl CompileTime {
   // TODO: change Vec to impl Iterator<CommandExecutable>
   fn parse_commands(
     &self, 
-    tokens: &mut impl Iterator<Item = Token>) -> Result<Vec<Arc<DescribedCommand>>, CompilationError> {
+    tokens: &mut impl Iterator<Item = Token>) -> Result<Vec<Arc<DescribedCommand>>, CompilationException> {
     
     let mut commands = Vec::new(); // Use iterator
 

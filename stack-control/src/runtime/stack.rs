@@ -1,12 +1,11 @@
+use crate::bytecode::command::RuntimeException;
+
 use super::value::Value;
 
 pub struct Stack {
   ahead_stack: Vec<Value>,
   stack: Vec<Value>
 }
-
-pub struct NoElementsAheadOfStackException {}
-pub struct NoElementsOnStackException {}
 
 impl Stack {
   pub fn new() -> Self {
@@ -27,17 +26,17 @@ impl Stack {
     self.stack.push(value);
   }
 
-  pub fn pop(&mut self) -> Option<Value> {
-    self.stack.pop()
+  pub fn pop(&mut self) -> Result<Value, RuntimeException> {
+    self.stack.pop().ok_or(RuntimeException::NoElementsOnStack)
   }
 
-  pub fn move_right(&mut self) -> Result<(), NoElementsAheadOfStackException> {
-    self.stack.push(self.ahead_stack.pop().ok_or(NoElementsAheadOfStackException {})?);
+  pub fn move_right(&mut self) -> Result<(), RuntimeException> {
+    self.stack.push(self.ahead_stack.pop().ok_or(RuntimeException::NoElementsAheadOfStack)?);
     Ok(())
   }
 
-  pub fn move_left(&mut self) -> Result<(), NoElementsOnStackException> {
-    self.ahead_stack.push(self.stack.pop().ok_or(NoElementsOnStackException{})?);
+  pub fn move_left(&mut self) -> Result<(), RuntimeException> {
+    self.ahead_stack.push(self.stack.pop().ok_or(RuntimeException::NoElementsOnStack)?);
     Ok(())
   }
 }

@@ -21,8 +21,8 @@ impl CommandMap {
 
   pub fn set(&mut self, command: DescribedCommand) {
     command.meta.aliases.iter()
-      .for_each(|e| { self.aliases_collection.insert(e.clone(), command.meta.name);});
-    self.collection.insert(command.meta.name, Arc::new(command));
+      .for_each(|e| { self.aliases_collection.insert(e.clone(), command.meta.key);});
+    self.collection.insert(command.meta.key, Arc::new(command));
   }
 
   pub fn get<'a>(&'a self, name: char) -> Option<Arc<DescribedCommand>> {

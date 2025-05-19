@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 itertools = "0.14.0"
 unicode-segmentation = "1.10.1"
+indoc = "2"

@@ -1,33 +1,34 @@
 use std::sync::Arc;
 
 use crate::{compiletime::command_map::{self, CommandMap}, runtime::{stack::Stack, value::Value}};
-
+use indoc::indoc;
 use super::{CommandExecutable, CommandMeta, DescribedCommand, ExecutionResult};
 
 macro_rules! define_commands {
-  (define $group:ident $(($names:ident ($keys:expr) [$($aliass:expr),*] to $stack:ident $defenitions:block)),+) => {
-    define_commands!{defenition $(($names ($keys) [$($aliass),*] to $stack $defenitions)),+}
-    pub fn $group(cmd_map: &mut crate::compiletime::command_map::CommandMap) {
-      define_commands!{meta cmd_map $(($names ($keys) [$($aliass),*] to $stack $defenitions)),+}
+  (define $group:ident $(($metadata:tt to $stack:ident $defenitions:block)),+) => {
+    define_commands!{defenition $(($metadata to $stack $defenitions)),+}
+    pub fn $group(cmd_map: &mut $crate::compiletime::command_map::CommandMap) {
+      define_commands!{meta cmd_map $(($metadata to $stack $defenitions)),+}
     }
   };
 
-  (meta $command_map:ident ($name:ident ($key:expr) [$($alias:expr),*] to $stack:ident $defenition:block)) => {
-    $command_map.set(crate::bytecode::command::DescribedCommand {
+  (meta $command_map:ident ([$name:ident $key:tt [$($alias:expr),*] $description:expr] to $stack:ident $defenition:block)) => {
+    $command_map.set($crate::bytecode::command::DescribedCommand {
       execution: Box::new($name {}),
-      meta: std::sync::Arc::new(crate::bytecode::command::CommandMeta {
-        name: $key,
-        aliases: [$($alias),*].iter().map(|s: &&str| s.to_string()).collect::<Vec<String>>()
+      meta: std::sync::Arc::new($crate::bytecode::command::CommandMeta {
+        key: $key,
+        aliases: [$($alias),*].iter().map(|s: &&str| s.to_string()).collect::<Vec<String>>(),
+        description: String::from($description)
       })
     });
   };
 
-  (meta $command_map:ident ($name:ident ($key:expr) [$($alias:expr),*] to $stack:ident $defenition:block), $(($names:ident ($keys:expr) [$($aliass:expr),*] to $stacks:ident $defenitions:block)),+) => {{
-    define_commands!{meta $command_map ($name ($key) [$($alias),*] to $stack $defenition)}
-    define_commands!{meta $command_map $(($names ($keys) [$($aliass),*] to $stacks $defenitions)),+}
+  (meta $command_map:ident ($metadata:tt to $stack:ident $defenition:block), $(($metadatas:tt to $stacks:ident $defenitions:block)),+) => {{
+    define_commands!{meta $command_map ($metadata to $stack $defenition)}
+    define_commands!{meta $command_map $(($metadatas to $stacks $defenitions)),+}
   }};
 
-  (defenition ($name:ident ($key:expr) [$($alias:expr),*] to $stack:ident $defenition:block)) => {
+  (defenition ([$name:ident $key:tt [$($alias:expr),*] $description:tt] to $stack:ident $defenition:block)) => {
     struct $name {}
     impl CommandExecutable for $name {
       fn execute(&self, $stack: &mut Stack) -> ExecutionResult $defenition
@@ -38,28 +39,30 @@ macro_rules! define_commands {
     }
   };
 
-  (defenition ($name:ident ($key:expr) [$($alias:expr),*] to $stack:ident $defenition:block), $(($names:ident ($keys:expr) [$($aliass:expr),*] to $stacks:ident $defenitions:block)),+) => {
-    define_commands!{defenition ($name ($key) [$($alias),*] to $stack $defenition)}
-    define_commands!{defenition $(($names ($keys) [$($aliass),*] to $stacks $defenitions)),+}
+  (defenition ($metadata:tt to $stack:ident $defenition:block), $(($metadatas:tt to $stacks:ident $defenitions:block)),+) => {
+    define_commands!{defenition ($metadata to $stack $defenition)}
+    define_commands!{defenition $(($metadatas to $stacks $defenitions)),+}
   };
 }
 
 pub(crate) use define_commands;
 
-/*
+
+
+
 define_commands!(define test_group 
   (
-    RandomMacro ('r') ["RandomMacro", "Other"] to $stack:ident {
-      ExecutionResult::Success
-    }
-  ),
-  (
-    AnotherMacro ('e') [] to $stack:ident {
+    [
+      RandomMacro 'k' ["alias", "otheralias"]
+      (indoc! {"
+        This is test command.
+        That does nothing.
+      "})
+    ] to stack {
       ExecutionResult::Success
     }
   )
 );
-*/
 
 // Always implemented command (strictly required for compilation)
 

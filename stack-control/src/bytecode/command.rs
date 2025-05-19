@@ -19,6 +19,7 @@ pub struct DescribedCommand {
 }
 
 pub struct CommandMeta {
-  pub name: char,
+  pub key: char,
   pub aliases: Vec<String>,
+  pub description: String
 }

@@ -1,5 +1,7 @@
 use std::{fmt::{self, format}, sync::Arc};
 
+use indoc::indoc;
+
 use crate::{bytecode::command::{core::{ListGeneratorCommand, StackPusherCommand}, CommandExecutable, CommandMeta, DescribedCommand, ExecutionResult}, runtime::value::Value, utils::{ArcHolder, Holder}};
 
 use super::{command_map::{CommandMap}, lexer::{CommandToken, Token}};
@@ -45,28 +47,37 @@ impl CompileTime {
           value_to_push: Value::OpenListIdentifier
         }),
         meta: Arc::new(CommandMeta {
-          name: '(',
+          key: '[',
           aliases: vec![
             String::from("listopen")
-          ]
+          ],
+          description: String::from(indoc! {"
+            Pushes `[` onto stack
+          "})
         })
       }), 
 
       list_generator: Arc::new(DescribedCommand {
         execution: Box::new(ListGeneratorCommand {}),
         meta: Arc::new(CommandMeta {
-          name: ')',
+          key: ']',
           aliases: vec![
             String::from("listgen")
-          ]
+          ],
+          description: String::from(indoc! {"
+            Consumes all values up to `[` and generates reversed list out of them
+          "})
         })
       }),
 
       stack_pusher_meta: Arc::new(CommandMeta {
-        name: 'ъ',
+        key: '↓',
         aliases: vec![
           String::from("pushstack")
-        ]
+        ],
+        description: String::from(indoc! {"
+          Pushes constant value onto stack.
+        "})
       })
     }
   }

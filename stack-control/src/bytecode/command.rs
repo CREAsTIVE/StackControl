@@ -1,9 +1,10 @@
 use std::sync::Arc;
 
-use crate::{runtime::stack::Stack, utils::Holder};
+use crate::runtime::stack::Stack;
 
 pub mod stack_manipulators;
 pub mod core;
+pub mod math;
 
 #[derive(strum_macros::IntoStaticStr)]
 pub enum RuntimeException {
@@ -24,4 +25,14 @@ pub struct CommandMeta {
   pub key: char,
   pub aliases: Vec<String>,
   pub description: String
+}
+
+impl Default for CommandMeta {
+  fn default() -> Self {
+    CommandMeta {
+      key: 'd',
+      aliases: vec![],
+      description: String::from("No description provided")
+    }
+  }
 }

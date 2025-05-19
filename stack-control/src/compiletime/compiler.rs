@@ -1,8 +1,8 @@
-use std::{fmt::{self, format}, sync::Arc};
+use std::sync::Arc;
 
 use indoc::indoc;
 
-use crate::{bytecode::command::{core::{ListGeneratorCommand, StackPusherCommand}, CommandExecutable, CommandMeta, DescribedCommand, RuntimeException}, runtime::value::Value, utils::{ArcHolder, Holder}};
+use crate::{bytecode::command::{core::{ListGeneratorCommand, StackPusherCommand}, CommandMeta, DescribedCommand}, runtime::value::Value};
 
 use super::{command_map::{CommandMap}, lexer::{CommandToken, Token}};
 
@@ -146,7 +146,7 @@ impl CompileTime {
         Token::FunctionOpenBracket => {
           // TODO: Iter
           commands.push(self.list_opener.clone());
-          let mut sublist_commands = self.parse_commands(tokens)?;
+          let sublist_commands = self.parse_commands(tokens)?;
           for exec in sublist_commands {
             commands.push(Arc::new(DescribedCommand {
               execution: Box::new(StackPusherCommand {

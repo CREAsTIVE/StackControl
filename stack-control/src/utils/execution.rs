@@ -1,4 +1,4 @@
-use crate::{bytecode::command::{stack_manipulators, RuntimeException}, compiletime::{self, command_map::CommandMap, compiler::{CompilationException, CompileTime}, lexer::split_string_to_tokens}, runtime::stack::Stack};
+use crate::{bytecode::command::{stack_manipulators, RuntimeException}, compiletime::{command_map::CommandMap, compiler::{CompilationException, CompileTime}, lexer::split_string_to_tokens}, runtime::stack::Stack};
 
 pub enum ExecutionException {
   Runtime(RuntimeException),

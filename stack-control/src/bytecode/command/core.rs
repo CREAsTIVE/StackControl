@@ -1,8 +1,7 @@
-use std::sync::Arc;
-
-use crate::{compiletime::command_map::{self, CommandMap}, runtime::{stack::Stack, value::{Array, Value}}};
 use indoc::indoc;
-use super::{CommandExecutable, CommandMeta, DescribedCommand, RuntimeException};
+use crate::runtime::{stack::Stack, value::{Array, Value}};
+
+use super::{CommandExecutable, RuntimeException};
 
 macro_rules! define_commands {
   (define $group:ident $(($metadata:tt to $stack:ident $defenitions:block)),+) => {
@@ -31,7 +30,7 @@ macro_rules! define_commands {
   (defenition ([$name:ident $key:tt [$($alias:expr),*] $description:tt] to $stack:ident $defenition:block)) => {
     struct $name {}
     impl CommandExecutable for $name {
-      fn execute(&self, $stack: &mut Stack) -> Result<(), RuntimeException> $defenition
+      fn execute(&self, $stack: &mut $crate::runtime::stack::Stack) -> Result<(), RuntimeException> $defenition
 
       fn to_string(&self) -> String {
         String::from($key)

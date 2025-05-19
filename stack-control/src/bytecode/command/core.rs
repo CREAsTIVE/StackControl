@@ -72,6 +72,7 @@ impl CommandExecutable for ListGeneratorCommand {
       if let Value::OpenListIdentifier = v {break;}
       new_list.push(v);
     }
+    new_list.reverse();
     
     stack.push(Value::Array(new_list));
     super::ExecutionResult::Success

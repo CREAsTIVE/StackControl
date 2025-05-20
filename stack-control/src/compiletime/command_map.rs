@@ -7,8 +7,8 @@ pub struct CommandMap {
   // BUT i waste like 2-3 days trying to do everything on lifetimes and pure references
   // Yeah, i m stupid, maybe later i will fix that
   // but for now i fcking tired, so forgive me once
-  collection: HashMap<char, Arc<DescribedCommand>>,
-  aliases_collection: HashMap<String, char>
+  pub collection: HashMap<char, Arc<DescribedCommand>>,
+  pub aliases_collection: HashMap<String, char>
 }
 
 impl CommandMap {

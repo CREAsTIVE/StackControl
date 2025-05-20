@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 stack-control = {path = "../stack-control"}
 serde_json = "*"
+serde = { version = "*", features = ["derive"]}

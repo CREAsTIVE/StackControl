@@ -23,7 +23,7 @@ jobs:
           ref: 'documentation'
       - name: Publishing documentation
         run: |
-          cp ../stack-control/stack-control-doc ./documentation.json
+          cp ../stack-control/stack-control-doc/documentation.json ./documentation_v1.json
           git config --global user.name 'CREAsTIVE'
           git config --global user.email 'CREAsTIVE@users.noreply.github.com'
           git commit -am "docs: documentation update for ${{env.github_sha}}"

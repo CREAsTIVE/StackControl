@@ -20,7 +20,7 @@ jobs:
       - name: Loading documentation branch
         uses: actions/checkout@v4
         with:
-          ref: 'documentation'
+          ref: 'gen-documentation'
       - name: Publishing documentation
         run: |
           cp ../stack-control/stack-control-doc/documentation.json ./documentation_v1.json

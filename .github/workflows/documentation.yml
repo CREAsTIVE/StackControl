@@ -9,21 +9,26 @@ jobs:
     runs-on: ubuntu-latest
     env:
       github_sha: $GITHUB_SHA
+      workspace: $GITHUB_WORKSPACE
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with: 
+          path: main
       - name: Generating documentation
         run: |
-          cd ./stack-control-doc
-          cargo run -- ./documentation.json
-          cd ../..
+          cd ${{env.workspace}}/main/stack-control-doc
+          cargo run -- ${{env.workspace}}/documentation.json
+          cd ${{env.workspace}}
       - name: Loading documentation branch
         uses: actions/checkout@v4
         with:
           ref: 'gen-documentation'
+          path: doc
       - name: Publishing documentation
         run: |
-          cp ../stack-control/stack-control-doc/documentation.json ./documentation_v1.json
+          cd ${{env.workspace}}/doc
+          cp ${{env.workspace}}/documentation.json ./documentation_v1.json
           git config --global user.name 'CREAsTIVE'
           git config --global user.email 'CREAsTIVE@users.noreply.github.com'
           git commit -am "docs: documentation update for ${{env.github_sha}}"

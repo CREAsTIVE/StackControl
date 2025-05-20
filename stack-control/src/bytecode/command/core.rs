@@ -1,9 +1,14 @@
 use indoc::indoc;
-use crate::runtime::{stack::Stack, value::{Array, Value}};
+use crate::{compiletime::command_map::CommandMap, runtime::{stack::Stack, value::{Array, Value}}};
 
-use super::{CommandExecutable, RuntimeException};
+use super::{math::append_math, stack_manipulators::append_stack_manipulators, CommandExecutable, RuntimeException};
 
-fn test(stack: &mut Stack) -> Result<(), RuntimeException> {
+pub fn bind_default_commands(map: &mut CommandMap) {
+  append_stack_manipulators(map);
+  append_math(map);
+}
+
+fn _test(_stack: &mut Stack) -> Result<(), RuntimeException> {
       //
       Ok(())
 }
@@ -65,9 +70,6 @@ macro_rules! define_commands {
 
 pub(crate) use define_commands;
 
-
-
-
 define_commands!(define test_group 
   (
     [
@@ -78,7 +80,7 @@ define_commands!(define test_group
           That does nothing.
         "})
       }
-    ] stack {
+    ] _stack {
       Ok(())
     }
   )

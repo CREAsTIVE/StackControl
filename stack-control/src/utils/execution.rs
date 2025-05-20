@@ -1,4 +1,4 @@
-use crate::{bytecode::command::{math::append_math, stack_manipulators, RuntimeException}, compiletime::{command_map::CommandMap, compiler::{CompilationException, CompileTime}, lexer::split_string_to_tokens}, runtime::stack::Stack};
+use crate::{bytecode::command::{core::bind_default_commands, RuntimeException}, compiletime::{compiler::{CompilationException, CompileTime}, lexer::split_string_to_tokens}, runtime::stack::Stack};
 
 pub enum ExecutionException {
   Runtime(RuntimeException),
@@ -27,7 +27,3 @@ pub fn execute(code: &str, stack: &mut Stack) -> Result<(), ExecutionException> 
   }
 }
 
-pub fn bind_default_commands(map: &mut CommandMap) {
-  stack_manipulators::append_stack_manipulators(map);
-  append_math(map);
-}

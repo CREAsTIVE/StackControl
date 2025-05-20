@@ -1,8 +1,6 @@
-use std::{env, fs::File, io::Write, ops::Deref};
+use std::{env, fs::File, io::Write};
 
-use stack_control::{compiletime::command_map::{self, CommandMap}, utils::execution::bind_default_commands};
-
-
+use stack_control::{bytecode::command::core::bind_default_commands, compiletime::command_map::CommandMap};
 
 #[derive(serde::Serialize)]
 struct CommandMeta<'m> {

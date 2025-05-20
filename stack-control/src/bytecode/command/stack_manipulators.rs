@@ -1,6 +1,5 @@
-use crate::runtime::stack::Stack;
 use indoc::indoc;
-use super::{core::define_commands, CommandExecutable, RuntimeException};
+use super::core::define_commands;
 
 define_commands!(define append_stack_manipulators
   (

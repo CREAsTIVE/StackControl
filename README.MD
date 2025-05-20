@@ -29,6 +29,6 @@ There's no specific purpose for this language – I just created it for fun. It 
 - [ ] More command
   - [ ] Iterable operation
   - [ ] Array modifiers
-  - [ ] Math operation / equality
+  - [x] Math operation / equality
   - [ ] Conditions
   - [ ] Loops

@@ -3,6 +3,11 @@ use crate::runtime::{stack::Stack, value::{Array, Value}};
 
 use super::{CommandExecutable, RuntimeException};
 
+fn test(stack: &mut Stack) -> Result<(), RuntimeException> {
+      //
+      Ok(())
+}
+
 macro_rules! define_commands {
   (define $group:ident $(($metadata:tt $stack:ident $defenitions:block)),+) => {
     define_commands!{defenition $(($metadata $stack $defenitions)),+}
@@ -43,8 +48,8 @@ macro_rules! define_commands {
 
   (defenition ([$name:ident $key:tt [$($alias:expr),*] $others:tt] $stack:ident $defenition:block)) => {
     struct $name {}
-    impl CommandExecutable for $name {
-      fn execute(&self, $stack: &mut $crate::runtime::stack::Stack) -> Result<(), RuntimeException> $defenition
+    impl $crate::bytecode::command::CommandExecutable for $name {
+      fn execute(&self, $stack: &mut $crate::runtime::stack::Stack) -> Result<(), $crate::bytecode::command::RuntimeException> $defenition
 
       fn to_string(&self) -> String {
         String::from($key)

@@ -2,17 +2,6 @@ use crate::runtime::stack::Stack;
 use indoc::indoc;
 use super::{core::define_commands, CommandExecutable, RuntimeException};
 
-fn test(stack: &mut Stack) -> Result<(), RuntimeException> {
-      //
-      let a = stack.pop()?;
-      let b = stack.pop()?;
-      stack.push(b.clone());
-      stack.push(a.clone());
-      stack.push(b);
-      stack.push(a);
-      Ok(())
-}
-
 define_commands!(define append_stack_manipulators
   (
     [

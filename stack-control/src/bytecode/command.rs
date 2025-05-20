@@ -9,7 +9,8 @@ pub mod math;
 #[derive(strum_macros::IntoStaticStr)]
 pub enum RuntimeException {
   NoElementsAheadOfStack,
-  NoElementsOnStack
+  NoElementsOnStack,
+  WrongElementType
 }
 pub trait CommandExecutable {
   fn execute(&self, stack: &mut Stack) -> Result<(), RuntimeException>;

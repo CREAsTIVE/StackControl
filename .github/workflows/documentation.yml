@@ -1,0 +1,30 @@
+name: Documentation Generation
+run-name: Generating documentation...
+on:
+  push:
+    branches: master
+
+jobs:
+  Generate-Documentation:
+    runs-on: ubuntu-latest
+    env:
+      github_sha: $GITHUB_SHA
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Generating documentation
+        run: |
+          cd ./stack-control-doc
+          cargo run -- ./documentation.json
+          cd ../..
+      - name: Loading documentation branch
+        uses: actions/checkout@v4
+        with:
+          ref: 'documentation'
+      - name: Publishing documentation
+        run: |
+          cp ../stack-control/stack-control-doc/documentation.json ./documentation_v1.json
+          git config --global user.name 'CREAsTIVE'
+          git config --global user.email 'CREAsTIVE@users.noreply.github.com'
+          git commit -am "docs: documentation update for ${{env.github_sha}}"
+          git push

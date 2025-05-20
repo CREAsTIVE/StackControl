@@ -1,0 +1,9 @@
+[package]
+name = "stack-control-doc"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+stack-control = {path = "../stack-control"}
+serde_json = "*"
+serde = { version = "*", features = ["derive"]}

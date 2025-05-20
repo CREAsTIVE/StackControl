@@ -1,2 +1,2 @@
 [workspace]
-members=[ "stack-control", "stack-control-shell"]
+members=[ "stack-control", "stack-control-doc", "stack-control-shell"]

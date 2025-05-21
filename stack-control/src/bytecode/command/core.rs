@@ -52,7 +52,7 @@ macro_rules! define_commands {
   }};
 
   (defenition ([$name:ident $key:tt [$($alias:expr),*] $others:tt] $stack:ident $defenition:block)) => {
-    struct $name {}
+    pub struct $name {}
     impl $crate::bytecode::command::CommandExecutable for $name {
       fn execute(&self, $stack: &mut $crate::runtime::stack::Stack) -> Result<(), $crate::bytecode::command::RuntimeException> $defenition
 

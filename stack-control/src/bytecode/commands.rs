@@ -1,4 +1,4 @@
-use std::{intrinsics::type_id, sync::Arc};
+use std::sync::Arc;
 
 use crate::runtime::stack::Stack;
 

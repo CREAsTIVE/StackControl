@@ -25,7 +25,6 @@ impl ToString for Token {
 }
 
 pub enum CommandToken {
-  Command(char),
   CommandOrAlias(String),
   ListOpenBracket,
   ListCloseBracket,
@@ -36,7 +35,6 @@ pub enum CommandToken {
 impl ToString for CommandToken {
   fn to_string(&self) -> String {
     match self {
-      Self::Command(char) => String::from(*char),
       Self::CommandOrAlias(alias) => alias.clone(),
       Self::ListOpenBracket => String::from("["),
       Self::ListCloseBracket => String::from("]"),
@@ -63,20 +61,26 @@ pub fn split_string_to_tokens(string: &str) -> Vec<Token> {
 pub fn split_to_tokens<'a>(mut symbols: Peekable<impl Iterator<Item = char> + Clone>) -> Vec<Token> {
   let mut result: Vec<Token> = Vec::new();
 
+  let p = parse_special_symbol;
+
   while let Some(_) = symbols.peek() {
     result.push(
-      parse_number(&mut symbols)
-      .or_else(|| parse_special_symbol(&mut symbols, '[', Token::CommandToken(CommandToken::ListOpenBracket))) 
-      .or_else(|| parse_special_symbol(&mut symbols, ']', Token::CommandToken(CommandToken::ListCloseBracket)))
-      .or_else(|| parse_special_symbol(&mut symbols, '(', Token::FunctionOpenBracket))
-      .or_else(|| parse_special_symbol(&mut symbols, ')', Token::FunctionCloseBracket))
-      .or_else(|| parse_special_symbol(&mut symbols, '#', Token::CommandToken(CommandToken::Function)))
+      // if one of special symbols
+                  p(&mut symbols, '[', Token::CommandToken(CommandToken::ListOpenBracket))
+      .or_else(|| p(&mut symbols, ']', Token::CommandToken(CommandToken::ListCloseBracket)))
+      .or_else(|| p(&mut symbols, '(', Token::FunctionOpenBracket))
+      .or_else(|| p(&mut symbols, ')', Token::FunctionCloseBracket))
+      // TODO: Change # to CommandContainer symbol
+      .or_else(|| p(&mut symbols, '#', Token::CommandToken(CommandToken::Function)))
+
+      // Or whitespace
       .or_else(|| {
         if symbols.peek()?.is_whitespace() {return Some(Token::WhiteSpace(symbols.next()?))}
         None
       })
-      .or_else(|| parse_alias(&mut symbols))
-      .unwrap_or_else(|| Token::CommandToken(CommandToken::Command(symbols.next().expect("Unexcpected exception: peek is lier!"))))
+      // Or one of "complex" tokens
+      .or_else(|| parse_number(&mut symbols))
+      .unwrap_or_else(|| parse_command_or_alias(&mut symbols).expect("Internal exception!"))
     );
   };
 
@@ -88,11 +92,12 @@ fn parse_special_symbol(iter: &mut Peekable<impl Iterator<Item = char> + Clone>,
   return None
 }
 
-fn parse_alias<'a>(iter: &mut Peekable<impl Iterator<Item = char> + Clone>) -> Option<Token> {
-  if !iter.peek()?.is_alphabetic() {return None}
+fn parse_command_or_alias<'a>(iter: &mut Peekable<impl Iterator<Item = char> + Clone>) -> Option<Token> {
+  let p = *iter.peek()?;
+  if p.is_numeric() || p.is_whitespace() || p == '.' {return None}
   let mut result = String::new();
   while let Some(symbol) = iter.peek() {
-    if !symbol.is_alphanumeric() {break;}
+    if symbol.is_whitespace() {break;}
     result.push(*symbol);
     iter.next();
   };

@@ -23,7 +23,7 @@ pub struct DescribedCommand {
 }
 
 pub struct CommandMeta {
-  pub key: char,
+  pub key: String,
   pub aliases: Vec<String>,
   pub description: String
 }
@@ -31,7 +31,7 @@ pub struct CommandMeta {
 impl Default for CommandMeta {
   fn default() -> Self {
     CommandMeta {
-      key: 'd',
+      key: String::from('d'),
       aliases: vec![],
       description: String::from("No description provided")
     }

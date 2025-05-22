@@ -7,8 +7,8 @@ pub struct CommandMap {
   // BUT i waste like 2-3 days trying to do everything on lifetimes and pure references
   // Yeah, i m stupid, maybe later i will fix that
   // but for now i fcking tired, so forgive me once
-  pub collection: HashMap<char, Arc<DescribedCommand>>,
-  pub aliases_collection: HashMap<String, char>
+  pub collection: HashMap<String, Arc<DescribedCommand>>,
+  pub aliases_collection: HashMap<String, String>
 }
 
 impl CommandMap {
@@ -21,15 +21,19 @@ impl CommandMap {
 
   pub fn set(&mut self, command: DescribedCommand) {
     command.meta.aliases.iter()
-      .for_each(|e| { self.aliases_collection.insert(e.clone(), command.meta.key);});
-    self.collection.insert(command.meta.key, Arc::new(command));
+      .for_each(|e| { self.aliases_collection.insert(e.clone(), command.meta.key.clone());});
+    self.collection.insert(command.meta.key.clone(), Arc::new(command));
   }
 
-  pub fn get<'a>(&'a self, name: char) -> Option<Arc<DescribedCommand>> {
-    Some(self.collection.get(&name)?.clone())
+  pub fn get_by_name(&self, name: &str) -> Option<Arc<DescribedCommand>> {
+    Some(self.collection.get(name)?.clone())
   }
 
-  pub fn get_alias(&self, alias: &str) -> Option<char> {
-    self.aliases_collection.get(alias).copied()
+  pub fn get_by_alias(&self, alias: &str) -> Option<&str> {
+    self.aliases_collection.get(alias).map(|s| s.as_str())
+  }
+
+  pub fn get(&self, ident: &str) -> Option<Arc<DescribedCommand>> {
+    self.get_by_name(ident).or_else(|| self.get_by_name(self.get_by_alias(ident)?))
   }
 }

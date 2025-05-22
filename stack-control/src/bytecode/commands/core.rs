@@ -26,7 +26,7 @@ macro_rules! define_commands {
     $command_map.set($crate::bytecode::commands::DescribedCommand {
       execution: Box::new($name {}),
       meta: std::sync::Arc::new($crate::bytecode::commands::CommandMeta {
-        key: $key,
+        key: String::from($key),
         aliases: [$($alias),*].iter().map(|s: &&str| s.to_string()).collect::<Vec<String>>(),
         $($vkey : $value),+,
         ..core::default::Default::default()

@@ -4,7 +4,7 @@ use stack_control::{bytecode::commands::core::bind_default_commands, compiletime
 
 #[derive(serde::Serialize)]
 struct CommandMeta<'m> {
-    key: char,
+    key: &'m str,
     aliases: &'m Vec<String>,
     description: &'m str,
 }
@@ -14,7 +14,7 @@ fn main() -> Result<(), i32> {
     bind_default_commands(&mut command_map);
     let metadata: Vec<CommandMeta> = command_map.collection.values()
         .map(|c| CommandMeta {
-            key: c.meta.key,
+            key: &c.meta.key,
             aliases: &c.meta.aliases,
             description: &c.meta.description.trim()
         }).collect();

@@ -20,6 +20,8 @@ pub enum CompilationException {
   AliasNotFound(String),
 }
 
+// TODO: Try macro?
+
 impl ToString for CompilationException {
   fn to_string(&self) -> String {
     match self {
@@ -27,10 +29,8 @@ impl ToString for CompilationException {
         format!("Alias {alias} not found"),
       CompilationException::CommandNotFound(cmd) => 
         format!("Command {cmd} not found"),
-      
       CompilationException::FunctionTokenRequired =>
         format!("Function token required"),
-
       CompilationException::UnexcpectedEndToken(t) => 
         format!("Unexcpected END token: {t}")
     }
@@ -47,7 +47,7 @@ impl CompileTime {
           value_to_push: Value::OpenListIdentifier
         }),
         meta: Arc::new(CommandMeta {
-          key: '[',
+          key: String::from('['),
           aliases: vec![
             String::from("listopen")
           ],
@@ -60,7 +60,7 @@ impl CompileTime {
       list_generator: Arc::new(DescribedCommand {
         execution: Box::new(ListGeneratorCommand {}),
         meta: Arc::new(CommandMeta {
-          key: ']',
+          key: String::from(']'),
           aliases: vec![
             String::from("listgen")
           ],
@@ -71,7 +71,7 @@ impl CompileTime {
       }),
 
       stack_pusher_meta: Arc::new(CommandMeta {
-        key: '↓',
+        key: String::from('↓'),
         aliases: vec![
           String::from("pushstack")
         ],
@@ -115,14 +115,10 @@ impl CompileTime {
           })
         } else {return Err(CompilationException::FunctionTokenRequired);} // TODO: Error
       },
-
-      CommandToken::Command(name) =>
-        self.command_map.get(name).ok_or(CompilationException::CommandNotFound(name))?,
       
       CommandToken::CommandOrAlias(alias) =>
-        self.command_map.get(
-          self.command_map.get_alias(&alias).ok_or(CompilationException::AliasNotFound(alias))?
-        ).ok_or(CompilationException::CommandNotFound('0'))?,
+        self.command_map.get(&alias)
+          .ok_or(CompilationException::CommandNotFound('0'))?,
 
       CommandToken::ListOpenBracket =>
         self.list_opener.clone(),

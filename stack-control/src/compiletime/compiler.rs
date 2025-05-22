@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use indoc::indoc;
 
-use crate::{bytecode::command::{core::{ListGeneratorCommand, StackPusherCommand}, CommandMeta, DescribedCommand}, runtime::value::Value};
+use crate::{bytecode::commands::{core::{ListGeneratorCommand, StackPusherCommand}, CommandMeta, DescribedCommand}, runtime::value::Value};
 
 use super::{command_map::{CommandMap}, lexer::{CommandToken, Token}};
 

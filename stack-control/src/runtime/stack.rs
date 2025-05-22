@@ -1,4 +1,4 @@
-use crate::bytecode::command::RuntimeException;
+use crate::bytecode::commands::RuntimeException;
 
 use super::value::Value;
 

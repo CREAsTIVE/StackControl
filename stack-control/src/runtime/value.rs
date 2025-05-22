@@ -2,7 +2,7 @@ use std::{cell::{Ref, RefCell, RefMut}, rc::Rc, sync::Arc};
 
 use itertools::Itertools;
 
-use crate::bytecode::command::DescribedCommand;
+use crate::bytecode::commands::DescribedCommand;
 
 
 pub struct Array {

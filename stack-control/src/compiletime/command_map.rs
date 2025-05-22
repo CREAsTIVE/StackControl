@@ -1,6 +1,6 @@
 use std::{collections::HashMap, sync::Arc};
 
-use crate::bytecode::command::DescribedCommand;
+use crate::bytecode::commands::DescribedCommand;
 
 pub struct CommandMap {
   // I know hashmap of arcs is bs

@@ -23,9 +23,9 @@ macro_rules! define_commands {
 
   // With additional fields
   (meta $command_map:ident ([$name:ident $key:tt [$($alias:expr),*] {$($vkey:ident : $value:expr),+}] $stack:ident $defenition:block)) => {
-    $command_map.set($crate::bytecode::command::DescribedCommand {
+    $command_map.set($crate::bytecode::commands::DescribedCommand {
       execution: Box::new($name {}),
-      meta: std::sync::Arc::new($crate::bytecode::command::CommandMeta {
+      meta: std::sync::Arc::new($crate::bytecode::commands::CommandMeta {
         key: $key,
         aliases: [$($alias),*].iter().map(|s: &&str| s.to_string()).collect::<Vec<String>>(),
         $($vkey : $value),+,
@@ -36,7 +36,7 @@ macro_rules! define_commands {
 
   // No additional fields
   (meta $command_map:ident ([$name:ident $key:tt [$($alias:expr),*] {}] $stack:ident $defenition:block)) => {
-    $command_map.set($crate::bytecode::command::DescribedCommand {
+    $command_map.set($crate::bytecode::commands::DescribedCommand {
       execution: Box::new($name {}),
       meta: std::sync::Arc::new($crate::bytecode::command::CommandMeta {
         key: $key,
@@ -53,8 +53,8 @@ macro_rules! define_commands {
 
   (defenition ([$name:ident $key:tt [$($alias:expr),*] $others:tt] $stack:ident $defenition:block)) => {
     pub struct $name {}
-    impl $crate::bytecode::command::CommandExecutable for $name {
-      fn execute(&self, $stack: &mut $crate::runtime::stack::Stack) -> Result<(), $crate::bytecode::command::RuntimeException> $defenition
+    impl $crate::bytecode::commands::CommandExecutable for $name {
+      fn execute(&self, $stack: &mut $crate::runtime::stack::Stack) -> Result<(), $crate::bytecode::commands::RuntimeException> $defenition
 
       fn to_string(&self) -> String {
         String::from($key)

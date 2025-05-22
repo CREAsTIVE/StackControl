@@ -77,8 +77,13 @@ pub fn split_to_tokens<'a>(mut symbols: Peekable<impl Iterator<Item = char> + Cl
 
       // Or whitespace
       .or_else(|| {
-        if symbols.peek()?.is_whitespace() {return Some(Token::WhiteSpace(symbols.next()?))}
+        if symbols.peek()?.is_whitespace() { return Some(Token::WhiteSpace(symbols.next()?)) }
         None
+      })
+      .or_else(|| {
+        if !symbols.peek()?.is_alphanumeric() { 
+          return Some(Token::CommandToken(CommandToken::CommandOrAlias(String::from(symbols.next()?)))) 
+        } None
       })
       // Or one of "complex" tokens
       .or_else(|| parse_number(&mut symbols))
@@ -99,7 +104,7 @@ fn parse_command_or_alias<'a>(iter: &mut Peekable<impl Iterator<Item = char> + C
   if p.is_numeric() || p.is_whitespace() || p == '.' {return None}
   let mut result = String::new();
   while let Some(symbol) = iter.peek() {
-    if symbol.is_whitespace() {break;}
+    if !symbol.is_alphanumeric() {break;}
     result.push(*symbol);
     iter.next();
   };

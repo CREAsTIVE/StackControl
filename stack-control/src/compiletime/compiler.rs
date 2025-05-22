@@ -6,7 +6,7 @@ use crate::{bytecode::commands::{core::{ListGeneratorCommand, StackPusherCommand
 
 use super::{command_map::{CommandMap}, lexer::{CommandToken, Token}};
 
-pub struct CompileTime {
+pub struct Scope {
   pub command_map: CommandMap,
   list_opener: Arc<DescribedCommand>, // StackPusherCommand{value_to_push: Value::OpenListIdentifier}
   list_generator: Arc<DescribedCommand>,
@@ -16,7 +16,7 @@ pub struct CompileTime {
 pub enum CompilationException {
   UnexcpectedEndToken(String),
   FunctionTokenRequired,
-  CommandNotFound(char),
+  CommandNotFound(String),
   AliasNotFound(String),
 }
 
@@ -28,7 +28,7 @@ impl ToString for CompilationException {
       CompilationException::AliasNotFound(alias) =>
         format!("Alias {alias} not found"),
       CompilationException::CommandNotFound(cmd) => 
-        format!("Command {cmd} not found"),
+        format!("Command '{cmd}' not found"),
       CompilationException::FunctionTokenRequired =>
         format!("Function token required"),
       CompilationException::UnexcpectedEndToken(t) => 
@@ -37,9 +37,9 @@ impl ToString for CompilationException {
   }
 }
 
-impl CompileTime {
+impl Scope {
   pub fn new() -> Self {
-    CompileTime { 
+    Scope { 
       command_map: CommandMap::new(), 
 
       list_opener: Arc::new(DescribedCommand {
@@ -118,7 +118,7 @@ impl CompileTime {
       
       CommandToken::CommandOrAlias(alias) =>
         self.command_map.get(&alias)
-          .ok_or(CompilationException::CommandNotFound('0'))?,
+          .ok_or(CompilationException::CommandNotFound(alias.clone()))?,
 
       CommandToken::ListOpenBracket =>
         self.list_opener.clone(),

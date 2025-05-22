@@ -6,6 +6,7 @@ Splits input string into separate tokens, no other logic involved
 
 use std::iter::Peekable;
 
+#[derive(Clone)]
 pub enum Token {
   FunctionOpenBracket,
   FunctionCloseBracket,
@@ -24,6 +25,7 @@ impl ToString for Token {
   }
 }
 
+#[derive(Clone)]
 pub enum CommandToken {
   CommandOrAlias(String),
   ListOpenBracket,

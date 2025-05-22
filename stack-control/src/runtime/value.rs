@@ -2,7 +2,7 @@ use std::{cell::{Cell, Ref, RefCell, RefMut}, rc::Rc, sync::Arc};
 
 use itertools::Itertools;
 
-use crate::bytecode::commands::DescribedCommand;
+use crate::bytecode::commands::{DescribedCommand, RuntimeException};
 
 
 pub struct Array {
@@ -59,6 +59,42 @@ pub enum Value {
   Array(Array), // TODO: Use Cow instead
   OpenListIdentifier,
   CommandContainer(Arc<DescribedCommand>)
+}
+
+impl Value {
+  pub fn b_true() -> Value { Value::Number(1.) }
+  pub fn b_false() -> Value {Value::Number(0.)}
+
+  pub fn execute(&self, stack: &mut super::stack::Stack) -> Result<(), RuntimeException> {
+    match self {
+      Value::Array(array) => {
+        for e in array.get().iter() {
+          e.execute(stack)?;
+        }
+        Ok(())
+      },
+
+      Value::CommandContainer(_described_command) => Err(RuntimeException::NotImplemented),
+
+      any => {
+        let other = stack.pop()?;
+        stack.push(if other == *any { Value::b_true() } else { Value::b_false() });
+        Ok(())
+      }
+    }
+  }
+}
+
+impl PartialEq for Value {
+  fn eq(&self, other: &Self) -> bool {
+    match (self, other) {
+      (Self::Number(l0), Self::Number(r0)) => l0 == r0,
+      (Self::Array(l0), Self::Array(r0)) => *l0.get() == *r0.get(),
+      (Self::CommandContainer(l0), Self::CommandContainer(r0)) => 
+        panic!("Command == Command not implemented yet!"),
+      _ => core::mem::discriminant(self) == core::mem::discriminant(other),
+    }
+  }
 }
 
 impl ToString for Value {

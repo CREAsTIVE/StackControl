@@ -1,16 +1,18 @@
-use std::sync::Arc;
+use std::{intrinsics::type_id, sync::Arc};
 
 use crate::runtime::stack::Stack;
 
 pub mod stack_manipulators;
 pub mod core;
 pub mod math;
+pub mod iters;
 
 #[derive(strum_macros::IntoStaticStr)]
 pub enum RuntimeException {
   NoElementsAheadOfStack,
   NoElementsOnStack,
-  WrongElementType
+  WrongElementType,
+  NotImplemented
 }
 pub trait CommandExecutable {
   fn execute(&self, stack: &mut Stack) -> Result<(), RuntimeException>;

@@ -1,6 +1,6 @@
 use crate::{compiletime::command_map::CommandMap, runtime::{stack::Stack, value::{Array, Value}}};
 
-use super::{math::append_math, stack_manipulators::append_stack_manipulators, CommandExecutable, DescribedCommand, DescribedCommandMaker, RuntimeException};
+use super::{iters::append_iters, math::append_math, stack_manipulators::append_stack_manipulators, CommandExecutable, DescribedCommand, DescribedCommandMaker, RuntimeException};
 
 use indoc::indoc;
 
@@ -9,7 +9,7 @@ pub fn bind_default_commands(map: &mut CommandMap) {
   
   append_stack_manipulators(map);
   append_math(map);
-  
+  append_iters(map);
 }
 
 fn _test(_stack: &mut Stack) -> Result<(), RuntimeException> {

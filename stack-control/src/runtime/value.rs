@@ -33,6 +33,10 @@ impl Array {
     self.pointer.borrow_mut()
   }
 
+  pub fn move_out(self) -> Vec<Value> {
+    self.pointer.take()
+  }
+
   fn own(&mut self) {
     let clone = self.pointer.borrow().clone();
     self.set(clone);

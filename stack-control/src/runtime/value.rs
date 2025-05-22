@@ -65,16 +65,17 @@ impl Value {
   pub fn b_true() -> Value { Value::Number(1.) }
   pub fn b_false() -> Value {Value::Number(0.)}
 
-  pub fn execute(&self, stack: &mut super::stack::Stack) -> Result<(), RuntimeException> {
+  pub fn invoke(&self, stack: &mut super::stack::Stack) -> Result<(), RuntimeException> {
     match self {
       Value::Array(array) => {
         for e in array.get().iter() {
-          e.execute(stack)?;
+          e.invoke(stack)?;
         }
         Ok(())
       },
 
-      Value::CommandContainer(_described_command) => Err(RuntimeException::NotImplemented),
+      Value::CommandContainer(described_command) => 
+        described_command.execution.execute(stack),
 
       any => {
         let other = stack.pop()?;

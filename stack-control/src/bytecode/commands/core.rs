@@ -1,10 +1,15 @@
 use crate::{compiletime::command_map::CommandMap, runtime::{stack::Stack, value::{Array, Value}}};
 
-use super::{math::append_math, stack_manipulators::append_stack_manipulators, CommandExecutable, DescribedCommand, RuntimeException};
+use super::{math::append_math, stack_manipulators::append_stack_manipulators, CommandExecutable, DescribedCommand, DescribedCommandMaker, RuntimeException};
+
+use indoc::indoc;
 
 pub fn bind_default_commands(map: &mut CommandMap) {
+  map.set(InvokeCommand::make_described_command());
+  
   append_stack_manipulators(map);
   append_math(map);
+  
 }
 
 fn _test(_stack: &mut Stack) -> Result<(), RuntimeException> {
@@ -12,19 +17,8 @@ fn _test(_stack: &mut Stack) -> Result<(), RuntimeException> {
       Ok(())
 }
 
-macro_rules! define_commands {
-  ($group:ident $($name:ident $args:tt $body:tt),*) => {
-    pub fn $group(cmd_map: &mut $crate::compiletime::command_map::CommandMap) {
-      $(cmd_map.set(<$name as $crate::bytecode::commands::DescribedCommandMaker>::make_described_command()));*
-    }
-    define_commands! {_ defenitions $($name $args $body),*}
-  };
-
-  (_ defenitions $($name:ident $args:tt $body:tt),*) => {
-    $(define_commands! {_ defenition $name $args $body})*
-  };
-
-  (_ defenition $name:ident ($key:expr, [$($alias:tt),*]) {with {$($pkey:ident : $pvalue:expr),*} $stack:ident $code:block}) => {
+macro_rules! define_command {
+  ($name:ident ($key:expr, [$($alias:tt),*]) {with {$($pkey:ident : $pvalue:expr),*} $stack:ident $code:block}) => {
     pub struct $name {}
 
     impl $crate::bytecode::commands::CommandExecutable for $name {
@@ -53,7 +47,17 @@ macro_rules! define_commands {
   };
 }
 
+macro_rules! define_commands {
+  ($group:ident $($name:ident $args:tt $body:tt),*) => {
+    pub fn $group(cmd_map: &mut $crate::compiletime::command_map::CommandMap) {
+      $(cmd_map.set(<$name as $crate::bytecode::commands::DescribedCommandMaker>::make_described_command()));*
+    }
+    $(crate::bytecode::commands::core::define_command! {$name $args $body})*
+  };
+}
+
 pub(crate) use define_commands;
+pub(crate) use define_command;
 
 // define_commands!(append_test_commands 
 //   RandomMacro ('k', ["alias", "otheralias"]) {
@@ -130,3 +134,16 @@ impl CommandExecutable for StackPusherCommand {
     format!("↓{val}")
   }
 }
+
+define_command!(
+  InvokeCommand ('!', ["invoke"]) {
+    with {
+      description: String::from(indoc!("
+        Consumes value and invokes it
+      "))
+    }
+    stack {
+      Ok(stack.pop()?.invoke(stack)?)
+    }
+  }
+);

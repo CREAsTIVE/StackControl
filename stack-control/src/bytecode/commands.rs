@@ -17,6 +17,10 @@ pub trait CommandExecutable {
   fn to_string(&self) -> String;
 }
 
+pub trait DescribedCommandMaker where Self : CommandExecutable {
+  fn make_described_command() -> DescribedCommand;
+}
+
 pub struct DescribedCommand {
   pub execution: Box<dyn CommandExecutable>,
   pub meta: Arc<CommandMeta>

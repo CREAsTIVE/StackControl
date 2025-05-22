@@ -24,157 +24,129 @@ fn math_op2_bool(stack: &mut Stack, f: impl Fn(f64, f64) -> bool) -> Result<(), 
   math_op2(stack, |a, b| if f(a, b) {1.} else {0.})
 }
 
-define_commands!(define append_math
-    // op2
-  (
-    [
-      OpAddCommand '+' ["add", "plus"]
-      {
-        description: String::from(indoc! {"
-          (.. b a) => (.. (b + a))
-        "})
-      }
-      
-    ] stack {
+define_commands!(append_math
+  // op2
+  OpAddCommand('+', ["add", "plus"]) {
+    with {
+      description: String::from(indoc! {"
+        (.. b a) => (.. (b + a))
+      "})
+    }
+    stack {
       math_op2(stack, |a, b| a + b)
     }
-  ), (
-    [
-      OpSubCommand '-' ["sub", "minus"]
-      {
-        description: String::from(indoc! {"
-          (.. b a) => (.. (a - b))
-        "})
-      }
-      
-    ] stack {
+  },
+  OpSubCommand('-', ["sub", "minus"]) {
+    with {
+      description: String::from(indoc! {"
+        (.. b a) => (.. (a - b))
+      "})
+    }
+    stack {
       math_op2(stack, |a, b| a - b)
     }
-  ), (
-    [
-      OpRSubCommand '∸' ["rsub", "rminus"]
-      {
-        description: String::from(indoc! {"
-          (.. b a) => (.. (b - a))
-        "})
-      }
-      
-    ] stack {
+  },
+  OpRSubCommand('∸', ["rsub", "rminus"]) {
+    with {
+      description: String::from(indoc! {"
+        (.. b a) => (.. (b - a))
+      "})
+    }
+    stack {
       math_op2(stack, |a, b| b - a)
     }
-  ), (
-    [
-      OpMulCommand '×' ["mul"]
-      {
-        description: String::from(indoc! {"
-          (.. b a) => (.. (a × b))
-        "})
-      }
-      
-    ] stack {
+  },
+  OpMulCommand('×', ["mul"]) {
+    with {
+      description: String::from(indoc! {"
+        (.. b a) => (.. (a × b))
+      "})
+    }
+    stack {
       math_op2(stack, |a, b| a * b)
     }
-  ), (
-    [
-      OpDivCommand '÷' ["div"]
-      {
-        description: String::from(indoc! {"
-          (.. b a) => (.. (a ÷ b))
-        "})
-      }
-      
-    ] stack {
+  },
+  OpDivCommand('÷', ["div"]) {
+    with {
+      description: String::from(indoc! {"
+        (.. b a) => (.. (a ÷ b))
+      "})
+    }
+    stack {
       math_op2(stack, |a, b| a / b)
     }
-  ), (
-    [
-      OpRDivCommand '∺' ["rdiv"]
-      {
-        description: String::from(indoc! {"
-          (.. b a) => (.. (b ÷ a))
-        "})
-      }
-      
-    ] stack {
+  },
+  OpRDivCommand('∺', ["rdiv"]) {
+    with {
+      description: String::from(indoc! {"
+        (.. b a) => (.. (b ÷ a))
+      "})
+    }
+    stack {
       math_op2(stack, |a, b| b / a)
     }
-  ), (
-    [
-      OpRootCommand '؆' ["root"]
-      {
-        description: String::from(indoc! {"
-          NOT IMPLEMENTED! (.. b a) => (.. (b√ a))
-        "})
-      }
-      
-    ] stack {
+  },
+  OpRootCommand('؆', ["root"]) {
+    with {
+      description: String::from(indoc! {"
+        NOT IMPLEMENTED! (.. b a) => (.. (b√ a))
+      "})
+    }
+    stack {
       math_op2(stack, |a, b| b / a)
     }
-  ),
+  },
     // op2 eq
-  (
-    [
-      OpHigherCommand '>' ["hi"]
-      {
-        description: String::from(indoc! {"
-          (.. b a) => (.. (a > b))
-        "})
-      }
-      
-    ] stack {
+  OpHigherCommand('>', ["hi"]) {
+    with {
+      description: String::from(indoc! {"
+        (.. b a) => (.. (a > b))
+      "})
+    }
+    stack {
       math_op2_bool(stack, |a, b| a > b)
     }
-  ), (
-    [
-      OpLessCommand '<' ["le"]
-      {
-        description: String::from(indoc! {"
-          (.. b a) => (.. (a < b))
-        "})
-      }
-      
-    ] stack {
+  },
+  OpLessCommand('<', ["le"]) {
+    with {
+      description: String::from(indoc! {"
+        (.. b a) => (.. (a < b))
+      "})
+    }
+    stack {
       math_op2_bool(stack, |a, b| a < b)
     }
-  ), (
-    [
-      OpHigherOrEqualsCommand '≥' ["heq"]
-      {
-        description: String::from(indoc! {"
-          (.. b a) => (.. (a ≥ b))
-        "})
-      }
-      
-    ] stack {
+  },
+  OpHigherOrEqualsCommand('≥', ["heq"]) {
+    with {
+      description: String::from(indoc! {"
+        (.. b a) => (.. (a ≥ b))
+      "})
+    }
+    stack {
       math_op2_bool(stack, |a, b| a >= b)
     }
-  ), (
-    [
-      OpLessOrEqualsCommand '≤' ["leq"]
-      {
-        description: String::from(indoc! {"
-          (.. b a) => (.. (a ≤ b))
-        "})
-      }
-      
-    ] stack {
+  },
+  OpLessOrEqualsCommand('≤', ["leq"]) {
+    with {
+      description: String::from(indoc! {"
+        (.. b a) => (.. (a ≤ b))
+      "})
+    }
+    stack {
       math_op2_bool(stack, |a, b| a <= b)
     }
-  ),
-
+  },
     // op1
-  (
-    [
-      OpSqrtCommand '√' ["sqrt"]
-      {
-        description: String::from(indoc! {"
-          (.. a) => (.. (√ a))
-        "})
-      }
-      
-    ] stack {
+  OpSqrtCommand('√', ["sqrt"]) {
+    with {
+      description: String::from(indoc! {"
+        (.. a) => (.. (√ a))
+      "})
+    }
+    stack {
       math_op1(stack, |a| a.sqrt())
     }
-  )
+  }
 );
 

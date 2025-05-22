@@ -1,4 +1,4 @@
-use std::{cell::{Ref, RefCell, RefMut}, rc::Rc, sync::Arc};
+use std::{cell::{Cell, Ref, RefCell, RefMut}, rc::Rc, sync::Arc};
 
 use itertools::Itertools;
 
@@ -7,20 +7,20 @@ use crate::bytecode::commands::DescribedCommand;
 
 pub struct Array {
   pointer: Rc<RefCell<Vec<Value>>>,
-  owned: bool
+  owned: Cell<bool>
 }
 
 impl Array {
   pub fn new() -> Self {
-    Array { pointer: Rc::new(RefCell::new(Vec::new())), owned: true }
+    Array { pointer: Rc::new(RefCell::new(Vec::new())), owned: Cell::new(true) }
   }
 
   pub fn from(vec: Vec<Value>) -> Self{
-    Array { pointer: Rc::new(RefCell::new(vec)), owned: true }
+    Array { pointer: Rc::new(RefCell::new(vec)), owned: Cell::new(true) }
   }
 
   pub fn from_ref(vec: Rc<RefCell<Vec<Value>>>) -> Self {
-    Array { pointer: vec, owned: false }
+    Array { pointer: vec, owned: Cell::new(false) }
   }
 
   pub fn get(&self) -> Ref<Vec<Value>> {
@@ -28,7 +28,7 @@ impl Array {
   }
 
   pub fn get_mut(&mut self) -> RefMut<Vec<Value>> {
-    if !self.owned { self.own(); }
+    if !self.owned.get() { self.own(); }
     
     self.pointer.borrow_mut()
   }
@@ -40,13 +40,16 @@ impl Array {
   
   pub fn set(&mut self, new_vec: Vec<Value>) {
     self.pointer = Rc::new(RefCell::new(new_vec));
-    self.owned = true
+    self.owned.set(true);
   }
 }
 
 impl Clone for Array {
   fn clone(&self) -> Self {
-    Array { pointer: self.pointer.clone(), owned: false }
+    // TODO: Custom RC or something like that
+    // That will be owned only when exists 1 or less refs
+    self.owned.set(false);  // On clone that array didn't owned. Temporary solution
+    Array { pointer: self.pointer.clone(), owned: Cell::new(false) }
   }
 }
 

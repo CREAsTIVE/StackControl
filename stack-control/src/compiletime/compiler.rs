@@ -17,7 +17,6 @@ pub enum CompilationException {
   UnexcpectedEndToken(String),
   FunctionTokenRequired,
   CommandNotFound(String),
-  AliasNotFound(String),
 }
 
 // TODO: Try macro?
@@ -25,8 +24,6 @@ pub enum CompilationException {
 impl ToString for CompilationException {
   fn to_string(&self) -> String {
     match self {
-      CompilationException::AliasNotFound(alias) =>
-        format!("Alias {alias} not found"),
       CompilationException::CommandNotFound(cmd) => 
         format!("Command '{cmd}' not found"),
       CompilationException::FunctionTokenRequired =>

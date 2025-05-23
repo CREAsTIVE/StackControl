@@ -1,12 +1,16 @@
 use std::sync::Arc;
 
 use itertools::Itertools;
+use thiserror::Error;
 
-use crate::{bytecode::commands::{core::bind_default_commands, DescribedCommand, RuntimeException}, compiletime::{command_map::{self, CommandMap}, compiler::{CompilationException, Scope}, lexer::{split_string_to_tokens, CommandToken, Token}}, runtime::stack::Stack};
+use crate::{bytecode::commands::{core::bind_default_commands, DescribedCommand, DescribedCommandHolder, RuntimeError}, compiletime::{command_map::{self, CommandMap}, compiler::{CompilationError, Scope}, lexer::{split_string_to_tokens, CommandToken, Token}}, runtime::stack::Stack};
 
+#[derive(Debug, Error)]
 pub enum ExecutionException {
-  Runtime(RuntimeException),
-  Compilation(CompilationException)
+  #[error("Runtime error: {0}")]
+  Runtime(RuntimeError),
+  #[error("Compile time error: {0}")]
+  Compilation(CompilationError)
 }
 
 pub fn simplify(tokens: &Vec<Token>, map: &CommandMap) -> impl Iterator<Item = Token> {
@@ -23,7 +27,7 @@ pub fn join(tokens: impl Iterator<Item = Token>) -> String {
     .join(", ")
 }
 
-pub fn execute_commands(commands: Vec<Arc<DescribedCommand>>, stack: &mut Stack) -> Result<(), RuntimeException> {
+pub fn execute_commands<'a>(commands: &Vec<DescribedCommand<'a>>, stack: &mut Stack<'a>) -> Result<(), RuntimeError> {
   for command in commands {
     command.execution.execute(stack)?;
   }
@@ -36,9 +40,9 @@ pub fn execute_code(code: &str, stack: &mut Stack) -> Result<(), ExecutionExcept
 
   bind_default_commands(&mut compiletime.command_map);
 
-  match compiletime.compile(tokens) {
+  match compiletime.compile(tokens.iter()) {
     Ok(commands) => 
-      execute_commands(commands, stack).or_else(|e| Err(ExecutionException::Runtime(e))),
+      execute_commands(&commands, stack).or_else(|e| Err(ExecutionException::Runtime(e))),
 
     Err(err) => {
       Err(ExecutionException::Compilation(err))

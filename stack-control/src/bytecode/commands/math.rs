@@ -1,26 +1,26 @@
 use crate::runtime::{stack::Stack, value::Value};
 
-use super::{core::define_commands, RuntimeException};
+use super::{core::define_commands, RuntimeError};
 use indoc::indoc;
 
 // TODO: logic for (arr + val) and (arr + arr)
-fn math_op2(stack: &mut Stack, f: impl Fn(f64, f64) -> f64) -> Result<(), RuntimeException> {
+fn math_op2(stack: &mut Stack, f: impl Fn(f64, f64) -> f64) -> Result<(), RuntimeError> {
   if let Value::Number(a) = stack.pop()? {
     if let Value::Number(b) = stack.pop()? {
       return Ok(stack.push(Value::Number(f(a, b))));
     }
   }
-  Err(RuntimeException::WrongElementType)
+  Err(RuntimeError::WrongElementType)
 }
 
-fn math_op1(stack: &mut Stack, f: impl Fn(f64) -> f64) -> Result<(), RuntimeException> {
+fn math_op1(stack: &mut Stack, f: impl Fn(f64) -> f64) -> Result<(), RuntimeError> {
   if let Value::Number(a) = stack.pop()? {
     return Ok(stack.push(Value::Number(f(a))));
   }
-  Err(RuntimeException::WrongElementType)
+  Err(RuntimeError::WrongElementType)
 }
 
-fn math_op2_bool(stack: &mut Stack, f: impl Fn(f64, f64) -> bool) -> Result<(), RuntimeException> {
+fn math_op2_bool(stack: &mut Stack, f: impl Fn(f64, f64) -> bool) -> Result<(), RuntimeError> {
   math_op2(stack, |a, b| if f(a, b) {1.} else {0.})
 }
 

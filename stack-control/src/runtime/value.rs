@@ -1,39 +1,39 @@
-use std::{cell::{Cell, Ref, RefCell, RefMut}, rc::Rc, sync::Arc};
+use std::{cell::{Cell, Ref, RefCell, RefMut}, rc::Rc};
 
 use itertools::Itertools;
 
-use crate::bytecode::commands::{DescribedCommand, RuntimeException};
+use crate::bytecode::commands::{DescribedCommand, RuntimeError};
 
 
-pub struct Array {
-  pointer: Rc<RefCell<Vec<Value>>>,
+pub struct Array<'a> {
+  pointer: Rc<RefCell<Vec<Value<'a>>>>,
   owned: Cell<bool>
 }
 
-impl Array {
+impl<'a> Array<'a> {
   pub fn new() -> Self {
     Array { pointer: Rc::new(RefCell::new(Vec::new())), owned: Cell::new(true) }
   }
 
-  pub fn from(vec: Vec<Value>) -> Self{
+  pub fn from(vec: Vec<Value<'a>>) -> Self {
     Array { pointer: Rc::new(RefCell::new(vec)), owned: Cell::new(true) }
   }
 
-  pub fn from_ref(vec: Rc<RefCell<Vec<Value>>>) -> Self {
+  pub fn from_ref(vec: Rc<RefCell<Vec<Value<'a>>>>) -> Self {
     Array { pointer: vec, owned: Cell::new(false) }
   }
 
-  pub fn get(&self) -> Ref<Vec<Value>> {
+  pub fn get(&self) -> Ref<Vec<Value<'a>>> {
     self.pointer.borrow()
   }
 
-  pub fn get_mut(&mut self) -> RefMut<Vec<Value>> {
+  pub fn get_mut(&mut self) -> RefMut<Vec<Value<'a>>> {
     if !self.owned.get() { self.own(); }
     
     self.pointer.borrow_mut()
   }
 
-  pub fn move_out(self) -> Vec<Value> {
+  pub fn move_out(self) -> Vec<Value<'a>> {
     self.pointer.take()
   }
 
@@ -42,13 +42,13 @@ impl Array {
     self.set(clone);
   }
   
-  pub fn set(&mut self, new_vec: Vec<Value>) {
+  pub fn set(&mut self, new_vec: Vec<Value<'a>>) {
     self.pointer = Rc::new(RefCell::new(new_vec));
     self.owned.set(true);
   }
 }
 
-impl Clone for Array {
+impl<'a> Clone for Array<'a> {
   fn clone(&self) -> Self {
     // TODO: Custom RC or something like that
     // That will be owned only when exists 1 or less refs
@@ -58,16 +58,16 @@ impl Clone for Array {
 }
 
 #[derive(Clone)]
-pub enum Value {
+pub enum Value<'a> {
   Number(f64),
-  Array(Array), // TODO: Use Cow instead
+  Array(Array<'a>), // TODO: Use Cow instead
   OpenListIdentifier,
-  CommandContainer(Arc<DescribedCommand>)
+  CommandContainer(DescribedCommand<'a>)
 }
 
-impl Value {
-  pub fn b_true() -> Value { Value::Number(1.) }
-  pub fn b_false() -> Value {Value::Number(0.)}
+impl<'a> Value<'a> {
+  pub fn b_true() -> Value<'a> { Value::Number(1.) }
+  pub fn b_false() -> Value<'a> { Value::Number(0.) }
 
   pub fn bool(&self) -> bool {
     match self {
@@ -78,7 +78,7 @@ impl Value {
     }
   }
 
-  pub fn invoke(&self, stack: &mut super::stack::Stack) -> Result<(), RuntimeException> {
+  pub fn invoke(&self, stack: &mut super::stack::Stack<'a>) -> Result<(), RuntimeError> {
     match self {
       Value::Array(array) => {
         for e in array.get().iter() {
@@ -99,7 +99,7 @@ impl Value {
   }
 }
 
-impl PartialEq for Value {
+impl<'a> PartialEq for Value<'a> {
   fn eq(&self, other: &Self) -> bool {
     match (self, other) {
       (Self::Number(l0), Self::Number(r0)) => l0 == r0,
@@ -111,7 +111,7 @@ impl PartialEq for Value {
   }
 }
 
-impl ToString for Value {
+impl<'a> ToString for Value<'a> {
   fn to_string(&self) -> String {
     match self {
       Self::Number(num) => num.to_string(),

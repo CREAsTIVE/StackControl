@@ -1,14 +1,14 @@
 use crate::runtime::{stack::Stack, value::{Array, Value}};
 
-use super::{core::define_commands, RuntimeException};
+use super::{core::define_commands, RuntimeError};
 use indoc::indoc;
 
-fn _test(stack: &mut Stack) -> Result<(), RuntimeException> {
+fn _test(stack: &mut Stack) -> Result<(), RuntimeError> {
       if let Value::Number(num) = stack.pop()? {
         stack.push(Value::Array(Array::from(
           (0..(num.round() as i32)).map(|n| Value::Number(n.into())).collect()
         )));
-      } Err(RuntimeException::WrongElementType)
+      } Err(RuntimeError::WrongElementType)
 }
 
 define_commands!(append_iters
@@ -29,7 +29,7 @@ define_commands!(append_iters
           new.push(stack.pop()?);
         }
         stack.push(Value::Array(Array::from(new)));
-      } else { return Err(RuntimeException::WrongElementType) }
+      } else { return Err(RuntimeError::WrongElementType) }
       Ok(())
     }
   },
@@ -56,7 +56,7 @@ define_commands!(append_iters
           (0..(num.round() as i32)).map(|n| Value::Number(n.into())).collect()
         )));
         return Ok(())
-      } Err(RuntimeException::WrongElementType)
+      } Err(RuntimeError::WrongElementType)
     }
   }
 );

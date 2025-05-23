@@ -2,7 +2,7 @@ use std::{error, sync::Arc};
 
 use thiserror::Error;
 
-use crate::runtime::stack::Stack;
+use crate::{runtime::stack::Stack, utils::{MArc, MBox}};
 
 pub mod stack_manipulators;
 pub mod core;
@@ -11,7 +11,7 @@ pub mod iters;
 pub mod conditionals;
 
 #[derive(Error, Debug)]
-pub enum RuntimeException {
+pub enum RuntimeError {
   #[error("No elements ahead of stack")]
   NoElementsAheadOfStack,
   #[error("No elements on stack")]
@@ -22,18 +22,33 @@ pub enum RuntimeException {
   NotImplemented
 }
 
-pub trait CommandExecutable {
-  fn execute(&self, stack: &mut Stack) -> Result<(), RuntimeException>;
+pub trait CommandExecutable<'c> {
+  fn execute(&self, stack: &mut Stack<'c>) -> Result<(), RuntimeError>;
   fn to_string(&self) -> String;
 }
 
-pub trait DescribedCommandMaker where Self : CommandExecutable {
-  fn make_described_command() -> DescribedCommand;
+pub trait DescribedCommandMaker<'c> {
+  fn make_described_command_holder() -> DescribedCommandHolder<'c>;
 }
 
-pub struct DescribedCommand {
-  pub execution: Box<dyn CommandExecutable>,
-  pub meta: Arc<CommandMeta>
+pub struct DescribedCommandHolder<'c> {
+  pub execution: Box<dyn CommandExecutable<'c> + 'c>,
+  pub meta: CommandMeta
+}
+
+impl<'c> DescribedCommandHolder<'c> {
+  pub fn make_ref<'a: 'c>(&'a self) -> DescribedCommand<'a> {
+    DescribedCommand {
+      execution: &*self.execution,
+      meta: &self.meta
+    }
+  }
+}
+
+#[derive(Clone)]
+pub struct DescribedCommand<'h> {
+  pub execution: &'h (dyn CommandExecutable<'h> + 'h),
+  pub meta: &'h CommandMeta
 }
 
 pub struct CommandMeta {
@@ -45,7 +60,7 @@ pub struct CommandMeta {
 impl Default for CommandMeta {
   fn default() -> Self {
     CommandMeta {
-      key: String::from('d'),
+      key: String::from('_'),
       aliases: vec![],
       description: String::from("No description provided")
     }

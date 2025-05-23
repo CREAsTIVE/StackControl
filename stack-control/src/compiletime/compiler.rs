@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use indoc::indoc;
+use thiserror::Error;
 
 use crate::{bytecode::commands::{core::{ListGeneratorCommand, StackPusherCommand}, CommandMeta, DescribedCommand}, runtime::value::Value};
 
@@ -13,25 +14,14 @@ pub struct Scope {
   stack_pusher_meta: Arc<CommandMeta>
 }
 
+#[derive(Error, Debug)]
 pub enum CompilationException {
+  #[error("Unexcpected End Token {0}")]
   UnexcpectedEndToken(String),
+  #[error("Function token required")]
   FunctionTokenRequired,
+  #[error("Command {0} not found")]
   CommandNotFound(String),
-}
-
-// TODO: Try macro?
-
-impl ToString for CompilationException {
-  fn to_string(&self) -> String {
-    match self {
-      CompilationException::CommandNotFound(cmd) => 
-        format!("Command '{cmd}' not found"),
-      CompilationException::FunctionTokenRequired =>
-        format!("Function token required"),
-      CompilationException::UnexcpectedEndToken(t) => 
-        format!("Unexcpected END token: {t}")
-    }
-  }
 }
 
 impl Scope {
@@ -90,8 +80,6 @@ impl Scope {
       &'a self, 
       token: CommandToken, 
       tokens: &mut impl Iterator<Item = Token>) -> Result<Arc<DescribedCommand>, CompilationException> {
-    
-
     Ok(match token {
       CommandToken::Number(num) => {
         Arc::new(DescribedCommand {

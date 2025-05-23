@@ -1,4 +1,6 @@
-use std::sync::Arc;
+use std::{error, sync::Arc};
+
+use thiserror::Error;
 
 use crate::runtime::stack::Stack;
 
@@ -8,13 +10,18 @@ pub mod math;
 pub mod iters;
 pub mod conditionals;
 
-#[derive(strum_macros::IntoStaticStr)]
+#[derive(Error, Debug)]
 pub enum RuntimeException {
+  #[error("No elements ahead of stack")]
   NoElementsAheadOfStack,
+  #[error("No elements on stack")]
   NoElementsOnStack,
+  #[error("Wrong element type")]
   WrongElementType,
+  #[error("Not implemented")]
   NotImplemented
 }
+
 pub trait CommandExecutable {
   fn execute(&self, stack: &mut Stack) -> Result<(), RuntimeException>;
   fn to_string(&self) -> String;

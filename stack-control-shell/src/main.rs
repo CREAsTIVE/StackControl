@@ -20,7 +20,7 @@ fn main() {
       Err(ExecutionException::Compilation(compile_error)) =>
         println!("Compilation error: {:?}", compile_error.to_string()),
       Err(ExecutionException::Runtime(runtime_error)) =>
-        println!("Runtime error: {:?}", Into::<&'static str>::into(runtime_error)),
+        println!("Runtime error: {:?}", runtime_error.to_string()),
 
       Ok(()) => {
         let stack_strin = stack.copy().iter()

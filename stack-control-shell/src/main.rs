@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use prompted::input;
-use stack_control::{bytecode::commands::core::bind_default_commands, compiletime::{compiler::Scope, lexer::split_string_to_tokens}, runtime::stack::Stack, utils::execution::{execute_code, join, simplify, ExecutionException}};
+use stack_control::{bytecode::commands::core::bind_default_commands, compiletime::{compiler::Scope, lexer::split_string_to_tokens}, runtime::stack::Stack, utils::execution::{execute_code, join, simplify_tokens, ExecutionException}};
 
 fn main() {
   loop {
@@ -13,7 +13,7 @@ fn main() {
     let mut stack = Stack::new();
 
     let tokens = split_string_to_tokens(&input);
-    println!("< {}", simplify(&tokens, &scope.command_map).map(|e| e.to_string()).join(""));
+    println!("< {}", simplify_tokens(&tokens, &scope.command_map).map(|e| e.to_string()).join(""));
     
 
     match execute_code(&input, &mut stack) {

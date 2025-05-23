@@ -15,6 +15,13 @@ pub enum RuntimeException {
   WrongElementType,
   NotImplemented
 }
+
+impl ToString for RuntimeException {
+  fn to_string(&self) -> String {
+    String::from(Into::<&'static str>::into(self))
+  }
+}
+
 pub trait CommandExecutable {
   fn execute(&self, stack: &mut Stack) -> Result<(), RuntimeException>;
   fn to_string(&self) -> String;

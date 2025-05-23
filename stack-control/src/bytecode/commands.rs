@@ -6,6 +6,7 @@ pub mod stack_manipulators;
 pub mod core;
 pub mod math;
 pub mod iters;
+pub mod conditionals;
 
 #[derive(strum_macros::IntoStaticStr)]
 pub enum RuntimeException {

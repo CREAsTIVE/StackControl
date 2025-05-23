@@ -1,6 +1,6 @@
 use crate::{compiletime::command_map::CommandMap, runtime::{stack::Stack, value::{Array, Value}}};
 
-use super::{iters::append_iters, math::append_math, stack_manipulators::append_stack_manipulators, CommandExecutable, DescribedCommand, DescribedCommandMaker, RuntimeException};
+use super::{conditionals::append_conditionals, iters::append_iters, math::append_math, stack_manipulators::append_stack_manipulators, CommandExecutable, DescribedCommand, DescribedCommandMaker, RuntimeException};
 
 use indoc::indoc;
 
@@ -10,10 +10,14 @@ pub fn bind_default_commands(map: &mut CommandMap) {
   append_stack_manipulators(map);
   append_math(map);
   append_iters(map);
+  append_conditionals(map);
 }
 
-fn _test(_stack: &mut Stack) -> Result<(), RuntimeException> {
+fn _test(stack: &mut Stack) -> Result<(), RuntimeException> {
       //
+      let truely = stack.pop()?;
+      let val = stack.pop()?.bool();
+      if val {truely.invoke(stack)?;}
       Ok(())
 }
 

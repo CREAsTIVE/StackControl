@@ -69,6 +69,15 @@ impl Value {
   pub fn b_true() -> Value { Value::Number(1.) }
   pub fn b_false() -> Value {Value::Number(0.)}
 
+  pub fn bool(&self) -> bool {
+    match self {
+      Value::Number(n) => *n != 0.,
+      Value::Array(arr) => arr.get().len() > 0,
+      Value::CommandContainer(_) => panic!("Not implemented!"),
+      Value::OpenListIdentifier => true
+    }
+  }
+
   pub fn invoke(&self, stack: &mut super::stack::Stack) -> Result<(), RuntimeException> {
     match self {
       Value::Array(array) => {

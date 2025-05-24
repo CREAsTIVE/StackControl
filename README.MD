@@ -24,11 +24,11 @@ There's no specific purpose for this language – I just created it for fun. It 
 *Requires Unicode support in your terminal/console.*  
 
 ### Pre-Release TODO
-- [ ] Documentation generator
+- [x] Documentation generator
 - [ ] Web version
 - [ ] More command
-  - [ ] Iterable operation
+  - [x] Iterable operation
   - [ ] Array modifiers
   - [x] Math operation / equality
-  - [ ] Conditions
+  - [x] Conditions
   - [ ] Loops

@@ -15,6 +15,11 @@ extern {
 }
 
 #[wasm_bindgen]
+pub fn ensure() {
+  log("stack-control wasm is loaded!");
+}
+
+#[wasm_bindgen]
 pub struct JSScope {
   #[wasm_bindgen(skip)]
   pub scope: Scope

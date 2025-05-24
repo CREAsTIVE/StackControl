@@ -1,0 +1,37 @@
+{
+  "name": "stack-control-site",
+  "version": "0.1.0",
+  "private": "true",
+  "scripts": {
+    "build": "webpack --disable-interpret -c ./webpack.config.ts",
+    "start": "webpack-dev-server --disable-interpret -c ./webpack.config.ts"
+  },
+  "keywords": [],
+  "author": "CREAsTIVE",
+  "license": "MIT",
+  "description": "",
+  "devDependencies": {
+    "@babel/core": "^7.27.1",
+    "@babel/preset-env": "^7.27.2",
+    "@types/lodash": "^4.17.17",
+    "@types/react": "^18.3.22",
+    "@types/react-dom": "^18.3.7",
+    "babel-loader": "^10.0.0",
+    "copy-webpack-plugin": "^13.0.0",
+    "css-loader": "^7.1.2",
+    "imports-loader": "^5.0.0",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths-webpack-plugin": "^4.2.0",
+    "typescript": "^5.8.3",
+    "webpack": "^5.99.9",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.1"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "stack-control-wasm": "file:resources/stack-control-wasm-module"
+  }
+}

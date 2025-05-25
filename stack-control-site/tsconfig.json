@@ -13,6 +13,7 @@
       "@/*": ["src/*"],
       "react": ["src/react"],
       "@@/*": ["resources/*"],
-    }
+    },
+    "plugins": [{ "name": "typescript-plugin-css-modules" }]
   }
 }

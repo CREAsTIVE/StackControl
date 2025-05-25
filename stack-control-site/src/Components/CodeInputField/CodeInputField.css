@@ -1,0 +1,15 @@
+.input {
+  border-style: solid;
+  border-radius: 10px;
+  border-width: 2px;
+  border-color: var(--text);
+  padding: 0.4em 0.6em;
+  resize: vertical;
+  background-color: var(--background-white);
+  font-size: 20px;
+}
+
+.input:focus {
+  outline: none !important;
+  border: 2px solid var(--text);
+}

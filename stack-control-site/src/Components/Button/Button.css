@@ -1,0 +1,11 @@
+.button {
+  border-radius: 10px;
+  background-color: var(--background-white);
+
+  border-width: 2px;
+  border-color: var(--text);
+  border-style: solid;
+
+  font-size: 15px;
+  font-weight: bold;
+}

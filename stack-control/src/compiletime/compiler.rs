@@ -69,22 +69,23 @@ impl Scope {
     }
   }
 
-  pub fn compile(&self, tokens: Vec<Token>) -> Result<Vec<Arc<DescribedCommand>>, CompilationException> {
-    let mut iter  = tokens.into_iter();
+  pub fn compile<'a>(&self, mut iter: impl Iterator<Item = &'a Token>) -> Result<Vec<Arc<DescribedCommand>>, CompilationException> {
     let commands = self.parse_commands(&mut iter)?;
     if let Some(e) = iter.next() {return Err(CompilationException::UnexcpectedEndToken(e.to_string()))} // todo: error message (unparsed tokens after ")")
     Ok(commands)
   }
 
   fn parse_command<'a>(
-      &'a self, 
-      token: CommandToken, 
-      tokens: &mut impl Iterator<Item = Token>) -> Result<Arc<DescribedCommand>, CompilationException> {
+      &self, 
+      token: &CommandToken, 
+      tokens: &mut impl Iterator<Item = &'a Token>) -> Result<Arc<DescribedCommand>, CompilationException> {
+    
+
     Ok(match token {
       CommandToken::Number(num) => {
         Arc::new(DescribedCommand {
           execution: Box::new(StackPusherCommand {
-            value_to_push: Value::Number(num)
+            value_to_push: Value::Number(*num)
           }),
           meta: self.stack_pusher_meta.clone() // TODO: Another meta
         })
@@ -114,9 +115,9 @@ impl Scope {
   }
 
   // TODO: change Vec to impl Iterator<CommandExecutable>
-  fn parse_commands(
+  fn parse_commands<'a>(
     &self, 
-    tokens: &mut impl Iterator<Item = Token>) -> Result<Vec<Arc<DescribedCommand>>, CompilationException> {
+    tokens: &mut impl Iterator<Item = &'a Token>) -> Result<Vec<Arc<DescribedCommand>>, CompilationException> {
     
     let mut commands = Vec::new(); // Use iterator
 
@@ -139,7 +140,7 @@ impl Scope {
           commands.push(self.list_generator.clone());
         },
         Token::CommandToken(cmd) => 
-          commands.push(self.parse_command(cmd, tokens)?),
+          commands.push(self.parse_command::<'a>(cmd, tokens)?),
       } // No FunctionCloseBracket token was found
     }
     Ok(commands)

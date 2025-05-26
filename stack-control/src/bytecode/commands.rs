@@ -30,7 +30,6 @@ pub trait CommandExecutable {
 pub trait DescribedCommandMaker where Self : CommandExecutable {
   fn make_described_command() -> DescribedCommand;
 }
-
 pub struct DescribedCommand {
   pub execution: Box<dyn CommandExecutable>,
   pub meta: Arc<CommandMeta>

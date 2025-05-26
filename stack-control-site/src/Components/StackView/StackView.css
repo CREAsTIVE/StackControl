@@ -1,0 +1,17 @@
+.stackview {
+  background-color: var(--background-white);
+  border-radius: 10px;
+  border-width: 2px;
+  border-style: solid;
+  align-self: stretch;
+  padding-left: 10px;
+  padding-right: 10px;
+  min-height: 1em;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.item {
+  font-size: 15px;
+}

@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Math&display=swap');
+
+:root {
+  --text: #0f2729;
+  --background: #c2fcff;
+  --background-white: #e6feff;
+  --primary: #49bfca;
+  --secondary: #f0c3af;
+  --accent: #b9ee58;
+}
+
+* {
+  font-family: "Noto Sans Math", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  color: var(--text);
+}

@@ -1,0 +1,9 @@
+.checkbox {
+  accent-color: var(--text);
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}

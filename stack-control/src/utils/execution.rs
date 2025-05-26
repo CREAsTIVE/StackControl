@@ -9,7 +9,7 @@ pub enum ExecutionException {
   Compilation(CompilationException)
 }
 
-pub fn simplify(tokens: &Vec<Token>, map: &CommandMap) -> impl Iterator<Item = Token> {
+pub fn simplify_tokens(tokens: &Vec<Token>, map: &CommandMap) -> impl Iterator<Item = Token> {
   tokens.iter().map(|e| match e {
     Token::CommandToken(CommandToken::CommandOrAlias(e)) => 
       Token::CommandToken(CommandToken::CommandOrAlias(String::from(map.get_by_alias(&e).unwrap_or(e)))),
@@ -36,7 +36,7 @@ pub fn execute_code(code: &str, stack: &mut Stack) -> Result<(), ExecutionExcept
 
   bind_default_commands(&mut compiletime.command_map);
 
-  match compiletime.compile(tokens) {
+  match compiletime.compile(tokens.iter()) {
     Ok(commands) => 
       execute_commands(commands, stack).or_else(|e| Err(ExecutionException::Runtime(e))),
 

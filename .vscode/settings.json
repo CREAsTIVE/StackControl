@@ -1,0 +1,4 @@
+// This file was commited intentionaly
+{
+  "typescript.tsdk": "stack-control-site\\node_modules\\typescript\\lib"
+}

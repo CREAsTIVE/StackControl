@@ -1,0 +1,45 @@
+name: Site building and deploying
+run-name: Building and deploying site...
+on:
+  push:
+    branches: master
+
+jobs:
+  Building-And-Deploying-Site:
+    runs-on: ubuntu-latest
+    name: Site Building And Deploying
+    env:
+      github_sha: $GITHUB_SHA
+      workspace: $GITHUB_WORKSPACE
+    steps:
+      - name: Checkout master branch
+        uses: actions/checkout@v4
+        with: 
+          path: main
+      - name: Generating documentation
+        run: |
+          cd ${{env.workspace}}/main/stack-control-site
+          cargo run --manifest-path ../stack-control-doc/Cargo.toml -- ./resources/documentation.json
+      - name: Building wasm
+        run: |
+          cd ${{env.workspace}}/main/stack-control-site
+          cargo install wasm-pack
+          wasm-pack build ../stack-control-wasm --out-dir ../stack-control-site/resources/stack-control-wasm-module
+      - name: Building and installing
+        run: |
+          cd ${{env.workspace}}/main/stack-control-site
+          npm install
+          npm run build
+      - name: Checkout gen-site
+        uses: actions/checkout@v4
+        with:
+          ref: 'gen-site'
+          path: site
+      - name: Publishing site
+        run: |
+          cd ${{env.workspace}}/site
+          cp -R ${{env.workspace}}/main/stack-control-site/dist  ${{env.workspace}}/site
+          git config --global user.name 'CREAsTIVE'
+          git config --global user.email 'CREAsTIVE@users.noreply.github.com'
+          git commit -am "docs: documentation update for ${{env.github_sha}}"
+          git push

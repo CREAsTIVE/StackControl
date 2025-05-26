@@ -10,7 +10,12 @@ import { CheckBox } from "./Components/CheckBox/CheckBox";
 let scope: sc.JSScope = sc.make_scope()
 
 const App = () => {
-  let code = new ValueState("");
+  const sourceUrl = window.location;
+  const params = new URLSearchParams(window.location.search);
+  const paramsCode = params.get("code");
+  
+
+  let code = new ValueState(paramsCode ? paramsCode : "");
   let items = new ValueState<string[]>([])
   let simplify = new ValueState(true);
 
@@ -49,6 +54,17 @@ const App = () => {
             className={styles.button}
             onClick={compile}
             text={<>RUN</>} 
+          />
+          <Button 
+            className={styles.button}
+            onClick={() => {
+              let url = new URL(window.location.href)
+              url.searchParams.set("code", code.get());
+              navigator.clipboard.writeText(url.toString())
+
+              alert("Link was copied to clipboard")
+            }}
+            text={<>COPY</>} 
           />
           <CheckBox 
             label="simplify"

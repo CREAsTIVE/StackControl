@@ -41,5 +41,6 @@ jobs:
           cp -R ${{env.workspace}}/main/stack-control-site/dist  ${{env.workspace}}/site
           git config --global user.name 'CREAsTIVE'
           git config --global user.email 'CREAsTIVE@users.noreply.github.com'
-          git commit -am "docs: documentation update for ${{env.github_sha}}"
+          git add .
+          git commit -am "gen: documentation update for ${{env.github_sha}}"
           git push

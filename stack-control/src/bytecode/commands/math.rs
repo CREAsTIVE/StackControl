@@ -3,6 +3,14 @@ use crate::runtime::{stack::Stack, value::Value};
 use super::{core::define_commands, RuntimeException};
 use indoc::indoc;
 
+fn _test(stack: &mut Stack) -> Result<(), RuntimeException> {
+      //
+      let a = stack.pop()?;
+      let b = stack.pop()?;
+      stack.push(if a.eq(&b) {Value::b_true()} else {Value::b_false()});
+      Ok(())
+}
+
 // TODO: logic for (arr + val) and (arr + arr)
 fn math_op2(stack: &mut Stack, f: impl Fn(f64, f64) -> f64) -> Result<(), RuntimeException> {
   if let Value::Number(a) = stack.pop()? {
@@ -97,6 +105,32 @@ define_commands!(append_math
     }
   },
     // op2 eq
+  OpEqCommand('=', ["eq"]) {
+    with {
+      description: String::from(indoc! {"
+        (.. b a) => (.. (a = b))
+      "})
+    }
+    stack {
+      let a = stack.pop()?;
+      let b = stack.pop()?;
+      stack.push(if a.eq(&b) {Value::b_true()} else {Value::b_false()});
+      Ok(())
+    }
+  }, 
+  OpNotEq('≠', ["neq"]) {
+    with {
+      description: String::from(indoc! {"
+        (.. b a) => (.. (a ≠ b))
+      "})
+    }
+    stack {
+      let a = stack.pop()?;
+      let b = stack.pop()?;
+      stack.push(if a.eq(&b) {Value::b_true()} else {Value::b_false()});
+      Ok(())
+    }
+  },
   OpHigherCommand('>', ["hi"]) {
     with {
       description: String::from(indoc! {"

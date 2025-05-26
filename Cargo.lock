@@ -167,7 +167,7 @@ dependencies = [
 
 [[package]]
 name = "stack-control-doc"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -176,7 +176,7 @@ dependencies = [
 
 [[package]]
 name = "stack-control-shell"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "itertools",
  "prompted",
@@ -185,7 +185,7 @@ dependencies = [
 
 [[package]]
 name = "stack-control-wasm"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "console_error_panic_hook",
  "itertools",

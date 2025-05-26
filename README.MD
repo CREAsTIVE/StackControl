@@ -1,6 +1,6 @@
 Stack Control  
 ---
-*Try it online! (coming soon)*  
+*[Try it online!](https://creastive.github.io/StackControl/)*  
 
 Stack Control is a stack-based programming language created by me. This is a Rust remake of the [original C# version](https://github.com/CREAsTIVE/StackControl-Deprecated).  
 There's no specific purpose for this language – I just created it for fun. It was inspired by [Uiua](https://www.uiua.org/) and other stack-based languages.  

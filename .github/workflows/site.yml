@@ -38,9 +38,9 @@ jobs:
       - name: Publishing site
         run: |
           cd ${{env.workspace}}/site
-          cp -R ${{env.workspace}}/main/stack-control-site/dist  ${{env.workspace}}/site
+          cp -R ${{env.workspace}}/main/stack-control-site/dist/.  ${{env.workspace}}/site
           git config --global user.name 'CREAsTIVE'
           git config --global user.email 'CREAsTIVE@users.noreply.github.com'
           git add .
-          git commit -am "gen: documentation update for ${{env.github_sha}}"
+          git commit -am "gen: site update for ${{env.github_sha}}"
           git push

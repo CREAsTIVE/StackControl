@@ -7,20 +7,20 @@ use crate::bytecode::commands::{DescribedCommand, RuntimeException};
 
 pub struct Array {
   pointer: Rc<RefCell<Vec<Value>>>,
-  owned: Cell<bool>
+  unique: Cell<bool>
 }
 
 impl Array {
   pub fn new() -> Self {
-    Array { pointer: Rc::new(RefCell::new(Vec::new())), owned: Cell::new(true) }
+    Array { pointer: Rc::new(RefCell::new(Vec::new())), unique: Cell::new(true) }
   }
 
   pub fn from(vec: Vec<Value>) -> Self{
-    Array { pointer: Rc::new(RefCell::new(vec)), owned: Cell::new(true) }
+    Array { pointer: Rc::new(RefCell::new(vec)), unique: Cell::new(true) }
   }
 
   pub fn from_ref(vec: Rc<RefCell<Vec<Value>>>) -> Self {
-    Array { pointer: vec, owned: Cell::new(false) }
+    Array { pointer: vec, unique: Cell::new(false) }
   }
 
   pub fn get(&self) -> Ref<Vec<Value>> {
@@ -28,23 +28,24 @@ impl Array {
   }
 
   pub fn get_mut(&mut self) -> RefMut<Vec<Value>> {
-    if !self.owned.get() { self.own(); }
-    
-    self.pointer.borrow_mut()
+    self.own().pointer.borrow_mut()
   }
 
-  pub fn move_out(self) -> Vec<Value> {
+  pub fn move_out(mut self) -> Vec<Value> {
+    self.own();
     self.pointer.take()
   }
 
-  fn own(&mut self) {
+  fn own(&mut self) -> &mut Self {
+    if self.unique.get() { return self; }
     let clone = self.pointer.borrow().clone();
     self.set(clone);
+    self
   }
   
   pub fn set(&mut self, new_vec: Vec<Value>) {
     self.pointer = Rc::new(RefCell::new(new_vec));
-    self.owned.set(true);
+    self.unique.set(true);
   }
 }
 
@@ -52,8 +53,8 @@ impl Clone for Array {
   fn clone(&self) -> Self {
     // TODO: Custom RC or something like that
     // That will be owned only when exists 1 or less refs
-    self.owned.set(false);  // On clone that array didn't owned. Temporary solution
-    Array { pointer: self.pointer.clone(), owned: Cell::new(false) }
+    self.unique.set(false);  // On clone that array didn't owned. Temporary solution
+    Array { pointer: self.pointer.clone(), unique: Cell::new(false) }
   }
 }
 

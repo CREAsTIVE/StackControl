@@ -11,11 +11,19 @@ jobs:
     env:
       github_sha: $GITHUB_SHA
       workspace: $GITHUB_WORKSPACE
+      cache-name: stack-control-site
     steps:
       - name: Checkout master branch
         uses: actions/checkout@v4
         with: 
           path: main
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
+          path: |
+            ~/.cargo
+            ${{env.workspace}}/main/target
       - name: Generating documentation
         run: |
           cd ${{env.workspace}}/main/stack-control-site

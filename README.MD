@@ -25,7 +25,7 @@ There's no specific purpose for this language – I just created it for fun. It 
 
 ### Pre-Release TODO
 - [x] Documentation generator
-- [ ] Web version
+- [x] Web version
 - [ ] More command
   - [x] Iterable operation
   - [ ] Array modifiers

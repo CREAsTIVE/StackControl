@@ -6,6 +6,8 @@ import { CodeInputField } from "./Components/CodeInputField/CodeInputField";
 import { Button } from "./Components/Button/Button";
 import { StackView } from "./Components/StackView/StackView";
 import { CheckBox } from "./Components/CheckBox/CheckBox";
+import documentationData from "@@/documentation.json"
+import { CommandDescription } from "./Components/CommandDescription/CommandDescription";
 
 let scope: sc.JSScope = sc.make_scope()
 
@@ -72,6 +74,14 @@ const App = () => {
           />
         </div>
       </div>
+    </div>
+    <h1>Commands:</h1>
+    <div className={styles.docs}>
+      {documentationData.map(e => 
+        <div className={styles.element}>
+          <CommandDescription commandInfo={e}/>
+        </div>
+      )}
     </div>
   </div>
 }

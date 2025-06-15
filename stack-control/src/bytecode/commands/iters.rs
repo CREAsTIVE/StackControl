@@ -12,7 +12,7 @@ fn _test(stack: &mut Stack) -> Result<(), RuntimeException> {
 }
 
 define_commands!(append_iters
-  EachCommand('∴', ["map", "each"]) {
+  EachCommand('∴', ["map"]) {
     with {
       description: String::from(indoc! {"
         Applies function to each value
@@ -57,6 +57,27 @@ define_commands!(append_iters
         )));
         return Ok(())
       } Err(RuntimeException::WrongElementType)
+    }
+  },
+
+  Loop("⟳", ["loop"]) {
+    with {
+      description: String::from(indoc! {"
+        Consumes number of times and function, that will be invoked number of times.
+      "})
+    }
+    stack {
+      let count = stack.pop()?;
+      let callable = stack.pop()?;
+      match count {
+        Value::Number(num) => {
+          for i in 0..=(num as i32) {
+            callable.invoke(stack)?;
+          }
+          Ok(())
+        }
+        _ => Err(RuntimeException::WrongElementType)
+      }
     }
   }
 );

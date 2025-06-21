@@ -67,8 +67,8 @@ define_commands!(append_iters
       "})
     }
     stack {
-      let count = stack.pop()?;
       let callable = stack.pop()?;
+      let count = stack.pop()?;
       match count {
         Value::Number(num) => {
           for i in 0..=(num as i32) {

@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use itertools::Itertools;
 
-use crate::{bytecode::commands::{core::bind_default_commands, DescribedCommand, RuntimeException}, compiletime::{command_map::{self, CommandMap}, compiler::{CompilationException, Scope}, lexer::{split_string_to_tokens, CommandToken, Token}}, runtime::stack::Stack};
+use crate::{bytecode::commands::{core::bind_default_commands, DescribedCommand, RuntimeException}, compiletime::{command_map::CommandMap, compiler::{CompilationException, Scope}, lexer::{split_string_to_tokens, CommandToken, Token}}, runtime::stack::Stack};
 
 pub enum ExecutionException {
   Runtime(RuntimeException),

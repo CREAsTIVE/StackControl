@@ -1,5 +1,5 @@
 use std::{cell::{Cell, Ref, RefCell, RefMut}, rc::Rc, sync::Arc};
-
+use std::fmt::Display;
 use itertools::Itertools;
 
 use crate::bytecode::commands::{DescribedCommand, RuntimeException};
@@ -105,29 +105,29 @@ impl PartialEq for Value {
     match (self, other) {
       (Self::Number(l0), Self::Number(r0)) => l0 == r0,
       (Self::Array(l0), Self::Array(r0)) => *l0.get() == *r0.get(),
-      (Self::CommandContainer(l0), Self::CommandContainer(r0)) => 
+      (Self::CommandContainer(_l0), Self::CommandContainer(_r0)) => 
         panic!("Command == Command not implemented yet!"),
       _ => core::mem::discriminant(self) == core::mem::discriminant(other),
     }
   }
 }
 
-impl ToString for Value {
-  fn to_string(&self) -> String {
-    match self {
+impl Display for Value {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    let str = match self {
       Self::Number(num) => num.to_string(),
       Self::Array(arr) => {
-        let strarr = arr.get().iter()
-          .map(|e| e.to_string())
-          .join(", ");
-
-        format!("[{strarr}]")
+        format!("[{}]", 
+          arr.get().iter()
+            .map(|e| e.to_string())
+            .join(" ")
+        )
       },
       Self::CommandContainer(cmd) =>
         String::from("◉") + &cmd.execution.to_string(),
-      
+
       Self::OpenListIdentifier => String::from("[")
-        
-    }
+    };
+    write!(f, "{}", str)
   }
 }

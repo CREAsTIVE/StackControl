@@ -3,7 +3,7 @@ Lexer:
 
 Splits input string into separate tokens, no other logic involved
 */
-
+use std::fmt::Display;
 use std::iter::Peekable;
 
 #[derive(Clone)]
@@ -14,14 +14,15 @@ pub enum Token {
   CommandToken(CommandToken)
 }
 
-impl ToString for Token {
-  fn to_string(&self) -> String {
-    match self {
+impl Display for Token {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    let str = match self {
       Self::FunctionOpenBracket => String::from("("),
       Self::FunctionCloseBracket => String::from(")"),
       Self::WhiteSpace(s) => String::from(*s),
       Self::CommandToken(cmd) => cmd.to_string()
-    }
+    };
+    write!(f, "{}", str)
   }
 }
 
@@ -34,15 +35,16 @@ pub enum CommandToken {
   Number(f64),
 }
 
-impl ToString for CommandToken {
-  fn to_string(&self) -> String {
-    match self {
+impl Display for CommandToken {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    let str = match self {
       Self::CommandOrAlias(alias) => alias.clone(),
       Self::ListOpenBracket => String::from("["),
       Self::ListCloseBracket => String::from("]"),
       Self::Function => String::from("#"),
       Self::Number(num) => num.to_string()
-    }
+    };
+    write!(f, "{}", str)
   }
 }
 
@@ -91,12 +93,12 @@ pub fn split_to_tokens<'a>(mut symbols: Peekable<impl Iterator<Item = char> + Cl
     );
   };
 
-  return result;
+  result
 }
 
 fn parse_special_symbol(iter: &mut Peekable<impl Iterator<Item = char> + Clone>, symbol: char, out_token: Token) -> Option<Token> {
   if *iter.peek()? == symbol {iter.next(); return Some(out_token);}
-  return None
+  None
 }
 
 fn parse_command_or_alias<'a>(iter: &mut Peekable<impl Iterator<Item = char> + Clone>) -> Option<Token> {
@@ -109,32 +111,36 @@ fn parse_command_or_alias<'a>(iter: &mut Peekable<impl Iterator<Item = char> + C
     iter.next();
   };
 
-  return Some(Token::CommandToken(CommandToken::CommandOrAlias(result)))
+  Some(Token::CommandToken(CommandToken::CommandOrAlias(result)))
 }
 
 fn parse_number<'a>(iter: &mut Peekable<impl Iterator<Item = char> + Clone>) -> Option<Token> {
   let next = *iter.peek()?;
-  if !(next.is_numeric()) && next != '.' {return None}
-  let mut first = String::from("0");
-  let mut second = String::new();
-  while let Some(symbol) = iter.peek() {
-    if !symbol.is_numeric() {break;}
-    first.push(*symbol);
-    iter.next();
-  }
+  if !next.is_numeric() && next != '.' {return None}
+  
+  fn parse_uint<'a>(initial: &str, iter: &mut Peekable<impl Iterator<Item = char> + Clone>) -> String {
+    let mut result = String::from(initial);
 
-  if let Some('.') = iter.peek() {
-    iter.next();
     while let Some(symbol) = iter.peek() {
       if !symbol.is_numeric() {break;}
-      second.push(*symbol);
+      result.push(*symbol);
       iter.next();
     }
+    
+    result
   }
-
-  second.push('0');
+  
+  let first = parse_uint("0", iter);
+  
+  let second = match iter.peek() {
+    Some('.') => {
+      iter.next();
+      parse_uint("", iter)
+    }
+    _ => String::from("0")
+  };
 
   if first.len() == 1 && second.len() == 1 {return None}
 
-  return Some(Token::CommandToken(CommandToken::Number((first + "." + &second).parse::<f64>().expect("Unexcpected Number parsing error"))));
+  Some(Token::CommandToken(CommandToken::Number((first + "." + &second).parse::<f64>().expect("Unexpected Number parsing error"))))
 }

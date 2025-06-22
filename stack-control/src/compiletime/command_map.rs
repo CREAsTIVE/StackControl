@@ -3,9 +3,9 @@ use std::{collections::HashMap, sync::Arc};
 use crate::bytecode::commands::DescribedCommand;
 
 pub struct CommandMap {
-  // I know hashmap of arcs is bs
-  // BUT i waste like 2-3 days trying to do everything on lifetimes and pure references
-  // Yeah, i m stupid, maybe later i will fix that
+  // I know the hashmap of arcs is bs
+  // BUT I waste like 2-3 days trying to do everything on lifetimes and pure references
+  // Yeah, i m stupid, maybe later I will fix that
   // but for now i fcking tired, so forgive me once
   pub collection: HashMap<String, Arc<DescribedCommand>>,
   pub aliases_collection: HashMap<String, String>

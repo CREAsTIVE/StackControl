@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use prompted::input;
-use stack_control::{bytecode::commands::core::bind_default_commands, compiletime::{compiler::Scope, lexer::split_string_to_tokens}, runtime::stack::Stack, utils::execution::{execute_code, join, simplify_tokens, ExecutionException}};
+use stack_control::{bytecode::commands::core::bind_default_commands, compiletime::{compiler::Scope, lexer::split_string_to_tokens}, runtime::stack::Stack, utils::execution::{execute_code, simplify_tokens, ExecutionException}};
 
 fn main() {
   loop {
@@ -23,11 +23,11 @@ fn main() {
         println!("Runtime error: {:?}", runtime_error.to_string()),
 
       Ok(()) => {
-        let stack_strin = stack.copy().iter()
+        let stack_string = stack.copy().iter()
           .map(|e| e.to_string())
           .join(", ");
 
-          println!("Stack: {stack_strin}");
+          println!("Stack: {stack_string}");
         }
     };
   }

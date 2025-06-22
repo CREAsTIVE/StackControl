@@ -15,9 +15,9 @@ pub fn bind_default_commands(map: &mut CommandMap) {
 
 fn _test(stack: &mut Stack) -> Result<(), RuntimeException> {
       //
-      let truely = stack.pop()?;
+      let truly = stack.pop()?;
       let val = stack.pop()?.bool();
-      if val {truely.invoke(stack)?;}
+      if val {truly.invoke(stack)?;}
       Ok(())
 }
 

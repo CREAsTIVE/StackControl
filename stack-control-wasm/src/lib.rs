@@ -53,12 +53,12 @@ pub fn execute(code: &str, scope: &mut JSScope, simplify: bool) -> Result<Execut
   let mut stack = Stack::new();
   let tokens = split_string_to_tokens(code);
   let commands = scope.scope.compile(tokens.iter())
-    .or_else(|e| Err(format!("Compilation excetion: {}", e.to_string())))?;
+    .or_else(|e| Err(format!("Compilation exception: {}", e.to_string())))?;
   execute_commands(commands, &mut stack)
-    .or_else(|e| Err(format!("Runtime excetion: {}", e.to_string())))?;
+    .or_else(|e| Err(format!("Runtime exception: {}", e.to_string())))?;
 
   Ok(ExecutionResult {
-    stack: stack,
+    stack,
     simplified: 
       if simplify { 
         Some(join(simplify_tokens(&tokens, &scope.scope.command_map).map(|t| t.to_string()), ""))

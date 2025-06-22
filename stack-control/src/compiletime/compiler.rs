@@ -140,7 +140,7 @@ impl Scope {
           commands.push(self.list_generator.clone());
         },
         Token::CommandToken(cmd) => 
-          commands.push(self.parse_command::<'a>(cmd, tokens)?),
+          commands.push(self.parse_command(cmd, tokens)?),
       } // No FunctionCloseBracket token was found
     }
     Ok(commands)

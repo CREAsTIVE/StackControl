@@ -1,7 +1,9 @@
 name: Site building and deploying
 run-name: Building and deploying site...
 on:
-  "release"
+  release:
+    types:
+      - published
 
 jobs:
   Building-And-Deploying-Site:

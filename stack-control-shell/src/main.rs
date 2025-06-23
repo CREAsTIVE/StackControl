@@ -1,6 +1,7 @@
 use itertools::Itertools;
 use prompted::input;
-use stack_control::{bytecode::commands::core::bind_default_commands, compiletime::{compiler::Scope, lexer::split_string_to_tokens}, runtime::stack::Stack, utils::execution::{execute_code, simplify_tokens, ExecutionException}};
+use stack_control::{bytecode::commands::core::bind_default_commands, compiletime::{compiler::Scope}, runtime::stack::Stack, utils::execution::{execute_code, simplify_tokens, ExecutionException}};
+use stack_control::compiletime::lexer::Lexer;
 
 fn main() {
   loop {
@@ -11,8 +12,9 @@ fn main() {
     bind_default_commands(&mut scope.command_map);
 
     let mut stack = Stack::new();
+    let lexer = Lexer::new();
 
-    let tokens = split_string_to_tokens(&input);
+    let tokens = lexer.split_string_to_tokens(&input);
     println!("< {}", simplify_tokens(&tokens, &scope.command_map).map(|e| e.to_string()).join(""));
     
 

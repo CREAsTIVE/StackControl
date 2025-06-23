@@ -1,7 +1,8 @@
-
+use std::thread::scope;
 use itertools::{join, Itertools};
-use stack_control::{bytecode::commands::core::bind_default_commands, compiletime::{compiler::Scope, lexer::split_string_to_tokens}, runtime::stack::Stack, utils::execution::{execute_commands, simplify_tokens}};
+use stack_control::{bytecode::commands::core::bind_default_commands, compiletime::{compiler::Scope}, runtime::stack::Stack, utils::execution::{execute_commands, simplify_tokens}};
 use wasm_bindgen::prelude::wasm_bindgen;
+use stack_control::compiletime::lexer::Lexer;
 
 #[cfg(feature = "wee_alloc")]
 #[global_allocator]
@@ -22,12 +23,14 @@ pub fn ensure() {
 #[wasm_bindgen]
 pub struct JSScope {
   #[wasm_bindgen(skip)]
-  pub scope: Scope
+  pub scope: Scope,
+  #[wasm_bindgen(skip)]
+  pub lexer: Lexer
 }
 
 #[wasm_bindgen]
 pub fn make_scope() -> JSScope {
-  let mut scope = JSScope { scope: Scope::new() };
+  let mut scope = JSScope { scope: Scope::new(), lexer: Lexer::new() };
   bind_default_commands(&mut scope.scope.command_map);
   scope
 }
@@ -51,7 +54,7 @@ impl ExecutionResult {
 #[wasm_bindgen]
 pub fn execute(code: &str, scope: &mut JSScope, simplify: bool) -> Result<ExecutionResult, String> {
   let mut stack = Stack::new();
-  let tokens = split_string_to_tokens(code);
+  let tokens = scope.lexer.split_string_to_tokens(code);
   let commands = scope.scope.compile(tokens.iter())
     .or_else(|e| Err(format!("Compilation exception: {}", e.to_string())))?;
   execute_commands(commands, &mut stack)

@@ -128,7 +128,13 @@ impl Lexer {
 
 
     fn parse_special_tokens(&self, iter: &mut Peekable<impl Iterator<Item = (usize, char)> + Clone>) -> Option<Token> {
-        self.special_tokens.get(&iter.next()?.1).cloned()
+        match self.special_tokens.get(&iter.peek()?.1) {
+            Some(token) => {
+                iter.next();
+                Some(token.clone())
+            },
+            None => None,
+        }
     }
 
     fn parse_command_or_alias<'a>(iter: &mut Peekable<impl Iterator<Item = (usize, char)> + Clone>) -> Option<Token> {

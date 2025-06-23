@@ -16,8 +16,8 @@ pub struct Scope {
 
 #[derive(Error, Debug)]
 pub enum CompilationException {
-  #[error("Unexcpected End Token {0}")]
-  UnexcpectedEndToken(String),
+  #[error("Unexpected End Token {0}")]
+  UnexpectedEndToken(String),
   #[error("Function token required")]
   FunctionTokenRequired,
   #[error("Command {0} not found")]
@@ -71,7 +71,7 @@ impl Scope {
 
   pub fn compile<'a>(&self, mut iter: impl Iterator<Item = &'a Token>) -> Result<Vec<Arc<DescribedCommand>>, CompilationException> {
     let commands = self.parse_commands(&mut iter)?;
-    if let Some(e) = iter.next() {return Err(CompilationException::UnexcpectedEndToken(e.to_string()))} // todo: error message (unparsed tokens after ")")
+    if let Some(e) = iter.next() {return Err(CompilationException::UnexpectedEndToken(e.to_string()))} // todo: error message (unparsed tokens after ")")
     Ok(commands)
   }
 

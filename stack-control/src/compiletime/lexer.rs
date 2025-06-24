@@ -6,7 +6,6 @@ Splits input string into separate tokens, no other logic involved
 use std::collections::{HashMap, HashSet};
 use std::fmt::Display;
 use std::iter::Peekable;
-use itertools::Itertools;
 
 #[derive(Clone)]
 pub enum Token {
@@ -18,13 +17,12 @@ pub enum Token {
 
 impl Display for Token {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let str = match self {
-            Self::FunctionOpenBracket => String::from("("),
-            Self::FunctionCloseBracket => String::from(")"),
-            Self::WhiteSpace(s) => String::from(*s),
-            Self::CommandToken(cmd) => cmd.to_string()
-        };
-        write!(f, "{}", str)
+        match self {
+            Self::FunctionOpenBracket => write!(f, "("),
+            Self::FunctionCloseBracket => write!(f, ")"),
+            Self::WhiteSpace(s) => write!(f, "{}", s),
+            Self::CommandToken(cmd) => write!(f, "{}", cmd)
+        }
     }
 }
 
@@ -39,14 +37,13 @@ pub enum CommandToken {
 
 impl Display for CommandToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let str = match self {
-            Self::CommandOrAlias(alias) => alias.clone(),
-            Self::ListOpenBracket => String::from("["),
-            Self::ListCloseBracket => String::from("]"),
-            Self::Function => String::from("◉"),
-            Self::Number(num) => num.to_string()
-        };
-        write!(f, "{}", str)
+        match self {
+            Self::CommandOrAlias(alias) => write!(f, "{}", alias),
+            Self::ListOpenBracket => write!(f, "["),
+            Self::ListCloseBracket => write!(f, "]"),
+            Self::Function => write!(f, "◉"),
+            Self::Number(num) => write!(f, "{}", num)
+        }
     }
 }
 

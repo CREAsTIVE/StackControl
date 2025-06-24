@@ -114,20 +114,19 @@ impl PartialEq for Value {
 
 impl Display for Value {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    let str = match self {
-      Self::Number(num) => num.to_string(),
-      Self::Array(arr) => {
-        format!("[{}]", 
+    match self {
+      Self::Number(num) => write!(f, "{}", num),
+      Self::Array(arr) =>
+        write!(f, "[{}]", 
           arr.get().iter()
             .map(|e| e.to_string())
             .join(" ")
         )
-      },
+      ,
       Self::CommandContainer(cmd) =>
-        String::from("◉") + &cmd.execution.to_string(),
+        write!(f, "{}{}", "◉", &cmd.execution.to_string()),
 
-      Self::OpenListIdentifier => String::from("[")
-    };
-    write!(f, "{}", str)
+      Self::OpenListIdentifier => write!(f, "{}", "[")
+    }
   }
 }

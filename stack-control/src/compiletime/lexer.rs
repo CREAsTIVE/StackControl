@@ -43,7 +43,7 @@ impl Display for CommandToken {
             Self::CommandOrAlias(alias) => alias.clone(),
             Self::ListOpenBracket => String::from("["),
             Self::ListCloseBracket => String::from("]"),
-            Self::Function => String::from("#"),
+            Self::Function => String::from("◉"),
             Self::Number(num) => num.to_string()
         };
         write!(f, "{}", str)
